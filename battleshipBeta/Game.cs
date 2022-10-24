@@ -9,8 +9,10 @@ namespace battleshipBeta
         public int[] doublee;
         public int roundCounter = 0;
 
-        Ship? tripleShip;
-        Ship? doubleeShip;
+        Ship? admiralShip;
+        Ship? cruiserShip;
+        Ship? destroyerShip;
+        Ship? assaultShip;
 
         private readonly Random _random;
 
@@ -22,10 +24,10 @@ namespace battleshipBeta
         //creating game area
         public int[,] createGameArea()
         {
-            gameArea = new int[5, 5];
-            for (int i = 0; i < 5; i++)
+            gameArea = new int[10, 10];
+            for (int i = 0; i < 10; i++)
             {
-                for (int j = 0; j < 5; j++)
+                for (int j = 0; j < 10; j++)
                 {
                     gameArea[i, j] = 0;
                 }
@@ -33,88 +35,137 @@ namespace battleshipBeta
             return gameArea;
         }
 
-        //placing ship with length 3
-        public void placeTriple(int[,] gameArea)
+        public void placementMechanism(int[,] gameArea, Ship ship)
         {
-            var locationIndex = _random.Next(5);
-            var startIndex = _random.Next(5);
-            var endIndex = startIndex + 3;
-
-            //check if placing is in game area
-            if(endIndex > 5)
-            {
-                int tempIndex = startIndex;
-                startIndex -= 3;
-                endIndex = tempIndex;
-            }
-
-            tripleShip = new Ship(3,"Triple", startIndex, endIndex, true, locationIndex);
+            var index = randomIndexing(5);
    
             //check vertical or horizontal placement
-            if(tripleShip.VerorHor == true)
-            {
-                for (int i = tripleShip.StartIndex; i < tripleShip.EndIndex; i++)
-                {
-                    gameArea[tripleShip.LocationIndex, i] = 1;
-                }
-            }
+            if(ship.VerorHor == true)
+                horizontalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
             else
-            {
-                for (int i = tripleShip.StartIndex; i < tripleShip.EndIndex; i++)
-                {
-                    gameArea[i, tripleShip.LocationIndex] = 1;
-                }
-            }
+                verticalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
         }
 
-        //placing ship with length 2
-        public void placeDouble(int[,] gameArea)
+        //placing ship with length 5
+        public void placeAdmiral(int[,] gameArea)
+        {
+            var index = randomIndexing(5);
+
+            admiralShip = new Ship(5,"Admiral", index.Item2, index.Item3, true, index.Item1);
+   
+            //check vertical or horizontal placement
+            if(admiralShip.VerorHor == true)
+                horizontalPlacement(gameArea, admiralShip.StartIndex, admiralShip.EndIndex, admiralShip.LocationIndex);
+            else
+                verticalPlacement(gameArea, admiralShip.StartIndex, admiralShip.EndIndex, admiralShip.LocationIndex);
+        }
+
+        //placing ship with length 4
+        public void placeCruiser(int[,] gameArea)
         {
             while(true)
             {
-                var locationIndex = _random.Next(5);
-                var startIndex = _random.Next(5);
-                var endIndex = startIndex + 2;
+                var index = randomIndexing(4);
 
-                //check if placing is in game area
-                if (endIndex > 5)
-                {
-                    int tempIndex = startIndex;
-                    startIndex -= 2;
-                    endIndex = tempIndex;
-                }
-
-                doubleeShip = new Ship(2, "Double", startIndex, endIndex, false, locationIndex);
+                cruiserShip = new Ship(4, "Cruiser", index.Item2, index.Item3, false, index.Item1);
 
                 // check vertical or horizontal placement
-                if (doubleeShip.VerorHor == true)
+                if (cruiserShip.VerorHor == true)
                 {
                     //check if the double ship overlap with triple ship
-                    for (int i = startIndex; i < endIndex; i++)
+                    for (int i = cruiserShip.StartIndex; i < cruiserShip.EndIndex; i++)
                     {
-                        if (gameArea[doubleeShip.LocationIndex, i] == 1)
+                        if (gameArea[cruiserShip.LocationIndex, i] == 1)
                             continue;
                     }
                     //place the double ship
-                    for (int i = doubleeShip.StartIndex; i < doubleeShip.EndIndex; i++)
-                    {
-                        gameArea[doubleeShip.LocationIndex, i] = 1;
-                    }
+                    horizontalPlacement(gameArea, cruiserShip.StartIndex, cruiserShip.EndIndex, cruiserShip.LocationIndex);
                     break;
                 }
                 else
                 {
                     //check if the double ship overlap with triple ship
-                    for (int i = startIndex; i < endIndex; i++)
+                    for (int i = cruiserShip.StartIndex; i < cruiserShip.EndIndex; i++)
                     {
-                        if (gameArea[i, doubleeShip.LocationIndex] == 1)
+                        if (gameArea[i, cruiserShip.LocationIndex] == 1)
                             continue;
                     }
                     //place the double ship
-                    for (int i = doubleeShip.StartIndex; i < doubleeShip.EndIndex; i++)
+                    verticalPlacement(gameArea, cruiserShip.StartIndex, cruiserShip.EndIndex, cruiserShip.LocationIndex);
+                    break;
+                }
+            }
+        }
+
+        //placing ship with length 3
+        public void placeDestroyer(int[,] gameArea)
+        {
+            while(true)
+            {
+                var index = randomIndexing(3);
+
+                destroyerShip = new Ship(3, "Destroyer", index.Item2, index.Item3, false, index.Item1);
+
+                // check vertical or horizontal placement
+                if (destroyerShip.VerorHor == true)
+                {
+                    //check if the double ship overlap with triple ship
+                    for (int i = destroyerShip.StartIndex; i < destroyerShip.EndIndex; i++)
                     {
-                        gameArea[i, doubleeShip.LocationIndex] = 1;
+                        if (gameArea[destroyerShip.LocationIndex, i] == 1)
+                            continue;
                     }
+                    //place the double ship
+                    horizontalPlacement(gameArea, destroyerShip.StartIndex, destroyerShip.EndIndex, destroyerShip.LocationIndex);
+                    break;
+                }
+                else
+                {
+                    //check if the double ship overlap with triple ship
+                    for (int i = destroyerShip.StartIndex; i < destroyerShip.EndIndex; i++)
+                    {
+                        if (gameArea[i, destroyerShip.LocationIndex] == 1)
+                            continue;
+                    }
+                    //place the double ship
+                    verticalPlacement(gameArea, destroyerShip.StartIndex, destroyerShip.EndIndex, destroyerShip.LocationIndex);
+                    break;
+                }
+            }
+        }
+        
+        //placing ship with length 2
+        public void placeAssault(int[,] gameArea)
+        {
+            while(true)
+            {
+                var index = randomIndexing(2);
+
+                assaultShip = new Ship(2, "Assault", index.Item2, index.Item3, false, index.Item1);
+
+                // check vertical or horizontal placement
+                if (assaultShip.VerorHor == true)
+                {
+                    //check if the double ship overlap with triple ship
+                    for (int i = assaultShip.StartIndex; i < assaultShip.EndIndex; i++)
+                    {
+                        if (gameArea[assaultShip.LocationIndex, i] == 1)
+                            continue;
+                    }
+                    //place the double ship
+                    horizontalPlacement(gameArea, assaultShip.StartIndex, assaultShip.EndIndex, assaultShip.LocationIndex);
+                    break;
+                }
+                else
+                {
+                    //check if the double ship overlap with triple ship
+                    for (int i = assaultShip.StartIndex; i < assaultShip.EndIndex; i++)
+                    {
+                        if (gameArea[i, assaultShip.LocationIndex] == 1)
+                            continue;
+                    }
+                    //place the double ship
+                    verticalPlacement(gameArea, assaultShip.StartIndex, assaultShip.EndIndex, assaultShip.LocationIndex);
                     break;
                 }
             }
@@ -123,9 +174,9 @@ namespace battleshipBeta
         //print game area
         public void printGameArea(int[,] gameArea)
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 10; i++)
             {
-                for (int j = 0; j < 5; j++)
+                for (int j = 0; j < 10; j++)
                 {
                     if (gameArea[i, j] == 0)
                         Console.Write("0 ");
@@ -164,7 +215,7 @@ namespace battleshipBeta
                 }
 
                 //check boundry of the game area for x
-                if (X >= 5 || X < 0)
+                if (X > 10 || X <= 0)
                 {
                     Console.WriteLine("You enter a number out of the coordinate!!");
                     continue;
@@ -187,32 +238,32 @@ namespace battleshipBeta
                 }
 
                 //check boundry of the game area for y
-                if (Y >= 5 || Y < 0)
+                if (Y > 10 || Y <= 0)
                 {
                     Console.WriteLine("You enter a number out of the coordinate!!");
                     continue;
                 }
 
                 //succesful shoot check
-                if (gameArea[X, Y] == 1)
+                if (gameArea[X-1, Y-1] == 1)
                 {
-                    gameArea[X, Y] = 2;
+                    gameArea[X-1, Y-1] = 2;
                     roundCounter++;
                     Console.WriteLine("You succesfully shoot!!");
                     break;
                 }
                 //already shot check
-                else if (gameArea[X, Y] == 2)
+                else if (gameArea[X-1, Y-1] == 2)
                 {
                     continue;
                 }
                 //already fail shot check
-                else if (gameArea[X, Y] == 3)
+                else if (gameArea[X-1, Y-1] == 3)
                     break;
                 //cross the fail shot
                 else
                 {
-                    gameArea[X, Y] = 3;
+                    gameArea[X-1, Y-1] = 3;
                     roundCounter++;
                     break;
                 } 
@@ -229,5 +280,37 @@ namespace battleshipBeta
 
             return oneDimension.Count(x => x.Equals(2));
         }
+
+        public void horizontalPlacement(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
+        {
+            for (int i = startIndex; i < endIndex; i++)
+            {
+                gameArea[locationIndex, i] = 1;
+            }
+        }
+
+        public void verticalPlacement(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
+        {
+            for (int i = startIndex; i < endIndex; i++)
+            {
+                gameArea[i, locationIndex] = 1;
+            }
+        }
+
+        public (int,int,int) randomIndexing(int shipLength)
+        {
+            var locationIndex = _random.Next(10);
+            var startIndex = _random.Next(10);
+            var endIndex = startIndex + shipLength;
+
+            if(endIndex > 10)
+            {
+                int tempIndex = startIndex;
+                startIndex -= shipLength;
+                endIndex = tempIndex;
+            }
+            return (locationIndex,startIndex,endIndex);
+        }
+
     }
 }
