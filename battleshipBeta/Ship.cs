@@ -9,14 +9,10 @@
         public bool VerorHor { get; set; }
         public int LocationIndex { get; set; }
 
-        public Ship(int length, string? name, int startIndex, int endIndex, bool verorHor, int locationIndex)
+        public Ship(int length, string? name)
         {
             Length = length;
             Name = name;
-            StartIndex = startIndex;
-            EndIndex = endIndex;
-            VerorHor = verorHor;
-            LocationIndex = locationIndex;
         }
     }
 }
