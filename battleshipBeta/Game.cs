@@ -5,12 +5,6 @@
         public int[,] gameArea;
         public int roundCounter = 0;
 
-        //Ship? admiralShip;
-        //Ship? cruiserShip;
-        //Ship? destroyerShip;
-        //Ship? assaultShip;
-        //Ship? ship;
-
         private readonly Random _random;
         private readonly Logger _logger;
 
@@ -28,75 +22,25 @@
             {
                 for (int j = 0; j < 10; j++)
                 {
-                    gameArea[i, j] = 0;
+                    gameArea[j, i] = 0;
                 }
             }
             _logger.print("Game area created...");
             return gameArea;
         }
 
-        //dynamic placement mechanism
-        public void placementMechanism(int[,] gameArea, Ship ship)
-        {
-            while (true)
-            {
-                var index = randomIndexing(ship.Length);
-                _logger.print($"Random indexing is done for {ship.Name}");
-
-                ship.StartIndex = index.Item2;
-                ship.EndIndex = index.Item3;
-                ship.LocationIndex = index.Item1;
-
-                var verorhor = randomIndexing(10);
-                if(verorhor.Item1 < 5)
-                {
-                    _logger.print($"{ship.Name} is placed verticaly.");
-                    ship.VerorHor = true;
-                }
-                else
-                {
-                    _logger.print($"{ship.Name} is placed horizontaly.");
-                    ship.VerorHor = false;
-                }
-                    
-                //check vertical or horizontal placement
-                if (ship.VerorHor == true)
-                {
-                    if (horizontalOverlapCheck(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
-                        continue;
-                    else if (checkOneSquareRuleinHorizontal(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
-                        continue;
-                    horizontalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
-                    break;
-                }   
-                else
-                {
-                    if (verticalOverlapCheck(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
-                        continue;
-                    else if (checkOneSquareRuleinVertical(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
-                        continue;
-                    verticalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
-                    break;
-                }     
-            }
-        }
-
         public bool checkOneSquareRuleinHorizontal(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
         {
-            for (int i = locationIndex - 1; i < locationIndex + 1; i++)
+            for (int i = locationIndex - 1; i <= locationIndex + 1; i++)
             {
-                for (int j = startIndex - 1; j < endIndex + 1; j++)
+                for (int j = startIndex - 1; j <= endIndex + 1; j++)
                 {
                     if (i > 9 || i < 0 || j < 0 || j > 9)
                         continue;
-                    try
+                    if (gameArea[i, j] == 1)
                     {
-                        if (gameArea[i, j] == 1)
-                            return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Message: " + ex.Message);
+                        Console.WriteLine("Placement is blocked by ONE SQUARE RULE!!!");
+                        return true;
                     }
                 }
             }
@@ -105,38 +49,34 @@
 
         public bool checkOneSquareRuleinVertical(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
         {
-            for (int i = locationIndex-1; i < locationIndex+1 ; i++)
+            for (int i = locationIndex-1; i <= locationIndex+1 ; i++)
             {
-                for (int j = startIndex-1; j < endIndex+1; j++)
+                for (int j = startIndex-1; j <= endIndex+1; j++)
                 {
                     if (i > 9 || i < 0 || j < 0 || j > 9)
                         continue;
-                    try
+                    if (gameArea[j, i] == 1)
                     {
-                        if (gameArea[j, i] == 1)
-                            return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Message: " + ex.Message);
-                    }
+                        Console.WriteLine("Placement is blocked by ONE SQUARE RULE!!!");
+                        return true;
+                    }    
                 }
             }
             return false;
         }
 
         //print game area
-        public void printGameArea(int[,] gameArea)
+        public void printComputerGameArea(int[,] gameArea)
         {
             for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 10; j++)
                 {
-                    if (gameArea[i, j] == 0)
+                    if (gameArea[j, i] == 0)
                         Console.Write("0 ");
-                    else if (gameArea[i, j] == 1)
+                    else if (gameArea[j, i] == 1)
                         Console.Write("0 ");
-                    else if (gameArea[i, j] == 3)
+                    else if (gameArea[j, i] == 3)
                         Console.Write("X ");
                     else
                         Console.Write("S ");
@@ -144,24 +84,41 @@
                 Console.Write("\n");
             }
             Console.WriteLine("_________________________");
-
         }
 
-        //shoot mechanism
+        public void printUserGameArea(int[,] userGameArea)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    if (gameArea[j, i] == 0)
+                        Console.Write("0 ");
+                    else if (gameArea[j, i] == 1)
+                        Console.Write("* ");
+                    else if (gameArea[j, i] == 3)
+                        Console.Write("X ");
+                    else
+                        Console.Write("S ");
+                }
+                Console.Write("\n");
+            }
+            Console.WriteLine("_________________________");
+        }
+
+        //user shoot mechanism
         public void shoot(int[,] gameArea)
         {
             while(true)
             {
-                Console.WriteLine("Please enter Y coordinate!");
-                Console.Write("Y: ");
+                Console.WriteLine("Please enter X coordinate!");
+                Console.Write("X: ");
                 var x_axis = Console.ReadLine();
                 int X;
 
                 //only number input validation
-                if(int.TryParse(x_axis, out X))
-                {
+                if(isItParsable(x_axis))
                     X = int.Parse(x_axis);
-                }
                 else
                 {
                     Console.WriteLine("You have to enter a number!!!");
@@ -175,16 +132,14 @@
                     continue;
                 }
 
-                Console.WriteLine("Please enter X coordinate!");
-                Console.Write("X: ");
+                Console.WriteLine("Please enter Y coordinate!");
+                Console.Write("Y: ");
                 var y_axis = Console.ReadLine();
                 int Y;
 
                 //only number input validation
-                if (int.TryParse(y_axis, out Y))
-                {
+                if (isItParsable(y_axis))
                     Y = int.Parse(y_axis);
-                }
                 else
                 {
                     Console.WriteLine("You have to enter a number!!!");
@@ -221,6 +176,37 @@
                     roundCounter++;
                     break;
                 } 
+            }
+        }
+
+        public void computerShoot(int[,] gameArea)
+        {
+            while(true)
+            {
+                var X = _random.Next(10);
+                var Y = _random.Next(10);
+                //succesful shoot check
+                if (gameArea[X, Y] == 1)
+                {
+                    gameArea[X, Y] = 2;
+                    roundCounter++;
+                    break;
+                }
+                //already shot check
+                else if (gameArea[X, Y] == 2)
+                {
+                    continue;
+                }
+                //already fail shot check
+                else if (gameArea[X, Y] == 3)
+                    break;
+                //cross the fail shot
+                else
+                {
+                    gameArea[X , Y] = 3;
+                    roundCounter++;
+                    break;
+                }
             }
         }
 
@@ -265,132 +251,222 @@
             return (locationIndex,startIndex,endIndex);
         }
 
-        public bool horizontalOverlapCheck(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
+        public bool isItParsable(string number)
         {
-            for (int i = startIndex; i < endIndex; i++)
-            {
-                if (gameArea[locationIndex, i] == 1)
-                    return true;
-            }
+            int checker;
+            if (int.TryParse(number, out checker))
+                return true;
             return false;
         }
 
-        public bool verticalOverlapCheck(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
-        {
-            for (int i = startIndex; i < endIndex; i++)
-            {
-                if (gameArea[i, i] == locationIndex)
-                    return true;
-            }
-            return false;
-        }
-
-        ////placing ship with length 5
-        //public void placeAdmiral(int[,] gameArea)
+        ////dynamic placement mechanism
+        //public void placementMechanism(int[,] gameArea, Ship ship)
         //{
-        //    var index = randomIndexing(5);
+        //    while (true)
+        //    {
+        //        var index = randomIndexing(ship.Length);
+        //        _logger.print($"Random indexing is done for {ship.Name}");
 
-        //    admiralShip = new Ship(5,"Admiral", index.Item2, index.Item3, true, index.Item1);
+        //        ship.StartIndex = index.Item2;
+        //        ship.EndIndex = index.Item3;
+        //        ship.LocationIndex = index.Item1;
 
-        //    //check vertical or horizontal placement
-        //    if(admiralShip.VerorHor == true)
-        //        horizontalPlacement(gameArea, admiralShip.StartIndex, admiralShip.EndIndex, admiralShip.LocationIndex);
-        //    else
-        //        verticalPlacement(gameArea, admiralShip.StartIndex, admiralShip.EndIndex, admiralShip.LocationIndex);
+        //        var verorhor = randomIndexing(10);
+        //        if(verorhor.Item1 < 5)
+        //        {
+        //            _logger.print($"{ship.Name} is placed verticaly.");
+        //            ship.VerorHor = true;
+        //        }
+        //        else
+        //        {
+        //            _logger.print($"{ship.Name} is placed horizontaly.");
+        //            ship.VerorHor = false;
+        //        }
+
+        //        //check vertical or horizontal placement
+        //        if (ship.VerorHor == true)
+        //        {
+        //            if (checkOneSquareRuleinHorizontal(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
+        //                continue;
+        //            horizontalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
+        //            break;
+        //        }   
+        //        else
+        //        {
+        //            if (checkOneSquareRuleinVertical(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
+        //                continue;
+        //            verticalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
+        //            break;
+        //        }     
+        //    }
         //}
 
-        ////placing ship with length 4
-        //public void placeCruiser(int[,] gameArea)
+        //public void placementMechanismForUser(int[,] gameArea, List<Ship> ships)
         //{
-        //    while(true)
+        //    while (true)
         //    {
-        //        var index = randomIndexing(4);
-
-        //        cruiserShip = new Ship(4, "Cruiser", index.Item2, index.Item3, false, index.Item1);
-
-        //        // check vertical or horizontal placement
-        //        if (cruiserShip.VerorHor == true)
+        //        //User ship choose mechanism start
+        //        Console.WriteLine("Choose the ship you want to place");
+        //        int i = 1;
+        //        foreach (Ship item in ships)
         //        {
-        //            //check if the double ship overlap with triple ship
-        //            if (horizontalOverlapCheck(gameArea, cruiserShip.StartIndex, cruiserShip.EndIndex, cruiserShip.LocationIndex))
+        //            if(item.isShipPlaced == true)
+        //            {
+        //                Console.WriteLine(i + ". " + item.Name + " X");
+        //            }
+        //            else
+        //                Console.WriteLine(i + ". " + item.Name);
+        //            i++;
+        //        }
+        //        Console.WriteLine("Choice: ");
+        //        var shipId = Console.ReadLine();
+        //        if (int.Parse(shipId) < 1 || int.Parse(shipId) > 6)
+        //            continue;
+        //        var ship = ships.Where(x => x.Id.ToString() == shipId).Single();
+        //        if (ship.isShipPlaced == true)
+        //        {
+        //            Console.WriteLine("You have already placed the ship!!!");
+        //            continue;
+        //        }
+        //        //User ship choose mechanism end
+        //        //Horizontal and Vertical placement choice start
+        //        Console.WriteLine("Do you want to place horizontaly or verticaly\n1. Vertical\n2. Horizontal");
+        //        Console.Write("Choice: ");
+        //        var verorhor = Console.ReadLine();
+        //        if (!isItParsable(verorhor))
+        //        {
+        //            Console.WriteLine("Invalid input!!");
+        //            continue;
+        //        }
+
+        //        if (verorhor == "1")
+        //        {
+        //            ship.VerorHor = false;
+        //            _logger.print($"{ship.Name} is vertical.");
+        //            Console.WriteLine("Please enter X coordinate!");
+        //            Console.Write("X: ");
+        //            var x_axis = Console.ReadLine();
+        //            int X;
+
+        //            //only number input validation
+        //            if (isItParsable(x_axis))
+        //                X = int.Parse(x_axis);
+        //            else
+        //            {
+        //                Console.WriteLine("You have to enter a number!!!");
         //                continue;
-        //            //place the double ship
-        //            horizontalPlacement(gameArea, cruiserShip.StartIndex, cruiserShip.EndIndex, cruiserShip.LocationIndex);
+        //            }
+
+        //            //check boundry of the game area for x
+        //            if (X > 10 || X <= 0)
+        //            {
+        //                Console.WriteLine("You enter a number out of the coordinate!!");
+        //                continue;
+        //            }
+        //            Console.WriteLine("Please enter Y coordinate!");
+        //            Console.Write("Y: ");
+        //            var y_axis = Console.ReadLine();
+        //            int Y;
+
+        //            //only number input validation
+        //            if (isItParsable(y_axis))
+        //                Y = int.Parse(y_axis);
+        //            else
+        //            {
+        //                Console.WriteLine("You have to enter a number!!!");
+        //                continue;
+        //            }
+
+        //            //check boundry of the game area for y
+        //            if (Y > 10 || Y <= 0)
+        //            {
+        //                Console.WriteLine("You enter a number out of the coordinate!!");
+        //                continue;
+        //            }
+        //            ship.LocationIndex = Y-1;
+        //            ship.StartIndex = X-1;
+        //        } 
+        //        else if(verorhor == "2")
+        //        {
+        //            ship.VerorHor = true;
+        //            _logger.print($"{ship.Name} is horizontal.");
+        //            Console.WriteLine("Please enter X coordinate!");
+        //            Console.Write("X: ");
+        //            var x_axis = Console.ReadLine();
+        //            int X;
+
+        //            //only number input validation
+        //            if (int.TryParse(x_axis, out X))
+        //            {
+        //                X = int.Parse(x_axis);
+        //            }
+        //            else
+        //            {
+        //                Console.WriteLine("You have to enter a number!!!");
+        //                continue;
+        //            }
+
+        //            //check boundry of the game area for x
+        //            if (X > 10 || X <= 0)
+        //            {
+        //                Console.WriteLine("You enter a number out of the coordinate!!");
+        //                continue;
+        //            }
+        //            Console.WriteLine("Please enter Y coordinate!");
+        //            Console.Write("Y: ");
+        //            var y_axis = Console.ReadLine();
+        //            int Y;
+
+        //            //only number input validation
+        //            if (int.TryParse(y_axis, out Y))
+        //            {
+        //                Y = int.Parse(y_axis);
+        //            }
+        //            else
+        //            {
+        //                Console.WriteLine("You have to enter a number!!!");
+        //                continue;
+        //            }
+
+        //            //check boundry of the game area for y
+        //            if (Y > 10 || Y <= 0)
+        //            {
+        //                Console.WriteLine("You enter a number out of the coordinate!!");
+        //                continue;
+        //            }
+        //            ship.LocationIndex = X-1;
+        //            ship.StartIndex = Y-1;
+        //        }
+
+        //        ship.EndIndex = ship.StartIndex + ship.Length;
+        //        if (ship.EndIndex >= 10 || ship.EndIndex < 0)
+        //        {
+        //            Console.WriteLine($"You choose wrong start index for ship, the length of the ship is {ship.Length}. Please try again.");
+        //            continue;
+        //        }
+        //        //Horizontal and Vertical placement choice start
+
+        //        _logger.print($"Random indexing is done for {ship.Name}");
+
+        //        //check vertical or horizontal placement
+        //        if (ship.VerorHor == true)
+        //        {
+        //            if (checkOneSquareRuleinHorizontal(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
+        //                continue;
+        //            horizontalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
+        //            ship.isShipPlaced = true;
         //            break;
         //        }
         //        else
         //        {
-        //            //check if the double ship overlap with triple ship
-        //            if (verticalOverlapCheck(gameArea, cruiserShip.StartIndex, cruiserShip.EndIndex, cruiserShip.LocationIndex))
+        //            if (checkOneSquareRuleinVertical(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
         //                continue;
-        //            //place the double ship
-        //            verticalPlacement(gameArea, cruiserShip.StartIndex, cruiserShip.EndIndex, cruiserShip.LocationIndex);
+        //            verticalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
+        //            ship.isShipPlaced = true;
         //            break;
         //        }
         //    }
+        //    printUserGameArea(gameArea);
         //}
-
-        ////placing ship with length 3
-        //public void placeDestroyer(int[,] gameArea)
-        //{
-        //    while(true)
-        //    {
-        //        var index = randomIndexing(3);
-
-        //        destroyerShip = new Ship(3, "Destroyer", index.Item2, index.Item3, false, index.Item1);
-
-        //        // check vertical or horizontal placement
-        //        if (destroyerShip.VerorHor == true)
-        //        {
-        //            //check if the double ship overlap with triple ship
-        //            if (horizontalOverlapCheck(gameArea, destroyerShip.StartIndex, destroyerShip.EndIndex, destroyerShip.LocationIndex))
-        //                continue;
-        //            //place the double ship
-        //            horizontalPlacement(gameArea, destroyerShip.StartIndex, destroyerShip.EndIndex, destroyerShip.LocationIndex);
-        //            break;
-        //        }
-        //        else
-        //        {
-        //            //check if the double ship overlap with triple ship
-        //            if (verticalOverlapCheck(gameArea, destroyerShip.StartIndex, destroyerShip.EndIndex, destroyerShip.LocationIndex))
-        //                continue;
-        //            //place the double ship
-        //            verticalPlacement(gameArea, destroyerShip.StartIndex, destroyerShip.EndIndex, destroyerShip.LocationIndex);
-        //            break;
-        //        }
-        //    }
-        //}
-
-        ////placing ship with length 2
-        //public void placeAssault(int[,] gameArea)
-        //{
-        //    while(true)
-        //    {
-        //        var index = randomIndexing(2);
-
-        //        assaultShip = new Ship(2, "Assault", index.Item2, index.Item3, false, index.Item1);
-
-        //        // check vertical or horizontal placement
-        //        if (assaultShip.VerorHor == true)
-        //        {
-        //            //check if the double ship overlap with triple ship
-        //            if (horizontalOverlapCheck(gameArea, assaultShip.StartIndex, assaultShip.EndIndex, assaultShip.LocationIndex))
-        //                continue;
-        //            //place the double ship
-        //            horizontalPlacement(gameArea, assaultShip.StartIndex, assaultShip.EndIndex, assaultShip.LocationIndex);
-        //            break;
-        //        }
-        //        else
-        //        {
-        //            //check if the double ship overlap with triple ship
-        //            if (verticalOverlapCheck(gameArea, assaultShip.StartIndex, assaultShip.EndIndex, assaultShip.LocationIndex))
-        //                continue;
-        //            //place the double ship
-        //            verticalPlacement(gameArea, assaultShip.StartIndex, assaultShip.EndIndex, assaultShip.LocationIndex);
-        //            break;
-        //        }
-        //    }
-        //}
-
     }
 }
