@@ -4,6 +4,7 @@ Random random = new Random();
 Logger logger = new Logger();
 Game game = new Game(random, logger);
 Placement placement = new Placement(game, logger, random);
+Excel excel = new Excel();
 
 Ship admiral = new Ship(5, "Admiral", 1);
 Ship cruiser = new Ship(4, "Cruiser", 2);
@@ -21,19 +22,14 @@ ships.Add(assault);
 int[,] computerGameArea = game.createGameArea();
 
 placement.placementMechanism(computerGameArea, admiral);
-//game.placementMechanism(computerGameArea, admiral);
 logger.print("Admiral is planted...");
 placement.placementMechanism(computerGameArea, cruiser);
-//game.placementMechanism(computerGameArea, cruiser);
 logger.print("Cruiser is planted...");
 placement.placementMechanism(computerGameArea, destroyer);
-//game.placementMechanism(computerGameArea, destroyer);
 logger.print("Destroyer is planted...");
 placement.placementMechanism(computerGameArea, destroyer2);
-//game.placementMechanism(computerGameArea, destroyer2);
 logger.print("Destroyer2 is planted...");
 placement.placementMechanism(computerGameArea, assault);
-//game.placementMechanism(computerGameArea, assault);
 logger.print("Assault is planted...");
 
 Console.WriteLine("____________________________");
@@ -53,15 +49,23 @@ while (true)
 {  
     Console.WriteLine("Please select the game mode");
     Console.WriteLine("____________________________");
-    Console.WriteLine("1. Traning Mode\n2. AI Mode\n3. Quit");
+    Console.WriteLine("1. Traning Mode\n2. AI Mode\n3. Past Results of Traning Mode\n4. Past Result of AI Mode\n5. Quit");
     Console.Write("Choice: ");
     var gameModeChoice = Console.ReadLine();
+    if (gameModeChoice == "5")
+        break;
+
     Console.WriteLine("____________________________");
     switch (gameModeChoice)
     {
         case "1":
             Console.WriteLine("Welcome to the Traning Mode...");
             Console.WriteLine("____________________________");
+            Console.Write("First Name: ");
+            string firstname_traning = Console.ReadLine();
+            Console.Write("Last Name: ");
+            string lastname_traning = Console.ReadLine();
+            DateTime startTime_traning = DateTime.Now;
             while (true)
             {
                 Console.WriteLine("____________________________");
@@ -79,16 +83,23 @@ while (true)
                     break;
                 }
             }
-            break;
+            DateTime endTime_traning = DateTime.Now;
+            double duration_traning = (endTime_traning.Minute - startTime_traning.Minute);
+            excel.writeTraningExcelFile(firstname_traning, lastname_traning, duration_traning);
+            continue;
         case "2":
             Console.WriteLine("Welcome to the AI Mode...");
             Console.WriteLine("____________________________");
+            Console.Write("First Name: ");
+            string firstname = Console.ReadLine();
+            Console.Write("Last Name: ");
+            string lastname = Console.ReadLine();
             int[,] userGameArea = game.createGameArea();
             for (int i = 0; i < ships.Count; i++)
             {
                 placement.placementMechanismForUser(userGameArea, ships);
-                //game.placementMechanismForUser(userGameArea, ships);
             }
+            DateTime startTime = DateTime.Now;
             while (true)
             {
                 Console.WriteLine("____________________________");
@@ -111,11 +122,19 @@ while (true)
                     break;
                 }
             }
-            break;
+            DateTime endTime = DateTime.Now;
+            double duration = (endTime.Minute - startTime.Minute);
+            excel.writeAIExcelFile(firstname, lastname, "Easy", duration);
+            continue;
         case "3":
-            break;
+            excel.readTraningExcelFile();
+            continue;
+        case "4":
+            excel.readAIExcelFile();
+            continue;
         default:
             Console.WriteLine("Please enter valid choice!!!");
             continue;
     }
 }
+Console.WriteLine("You have successfully exit.");
