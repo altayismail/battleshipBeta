@@ -12,7 +12,7 @@ namespace battleshipBeta
         {
             WorkBook workbook = WorkBook.Load(traning_path);
             WorkSheet sheet = workbook.WorkSheets.First();
-            Console.WriteLine("Score Table \n _______________________________________");
+            Console.WriteLine("Score Table of Traning Mode \n _______________________________________");
             Console.WriteLine(" First Name | Last Name | Duration (Min)|");
 
             foreach (var cell in sheet["A2:C10"])
@@ -45,7 +45,7 @@ namespace battleshipBeta
         {
             WorkBook workbook = WorkBook.Load(ai_path);
             WorkSheet sheet = workbook.WorkSheets.First();
-            Console.WriteLine("Score Table \n _______________________________________");
+            Console.WriteLine("Score Table of AI Mode \n _______________________________________");
             Console.WriteLine(" First Name | Last Name | Mode | Duration (Min)|");
 
             foreach (var cell in sheet["A2:D10"])

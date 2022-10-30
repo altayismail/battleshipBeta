@@ -59,23 +59,9 @@
             while (true)
             {
                 //User ship choose mechanism start
-                Console.WriteLine("Choose the ship you want to place");
-                int i = 1;
-                foreach (Ship item in ships)
-                {
-                    if (item.isShipPlaced == true)
-                    {
-                        Console.WriteLine(i + ". " + item.Name + " X");
-                    }
-                    else
-                        Console.WriteLine(i + ". " + item.Name);
-                    i++;
-                }
-                Console.Write("Choice: ");
-                var shipId = Console.ReadLine();
-                if (int.Parse(shipId) < 1 || int.Parse(shipId) > 6 || string.IsNullOrEmpty(shipId))
-                    continue;
-                var ship = ships.Where(x => x.Id.ToString() == shipId).Single();
+                int shipId = int.Parse(chooseShip(ships));
+                var ship = ships.Where(x => x.Id == shipId).Single();
+
                 if (ship.isShipPlaced == true)
                 {
                     Console.WriteLine("You have already placed the ship!!!");
@@ -83,113 +69,23 @@
                 }
                 Console.WriteLine("********************************");
                 //User ship choose mechanism end
+
                 //Horizontal and Vertical placement choice start
-                Console.WriteLine("Do you want to place horizontaly or verticaly\n1. Vertical\n2. Horizontal");
-                Console.Write("Choice: ");
-                var verorhor = Console.ReadLine();
-                if (!_game.isItParsable(verorhor))
-                {
-                    Console.WriteLine("Invalid input!!");
-                    continue;
-                }
+                string verorhor = VerorHorChoice();
 
                 if (verorhor == "1")
                 {
                     ship.VerorHor = true;
                     _logger.print($"{ship.Name} is vertical.");
-                    Console.WriteLine("Please enter X start coordinate!");
-                    Console.Write("X: ");
-                    var x_axis = Console.ReadLine();
-                    int X;
 
-                    //only number input validation
-                    if (_game.isItParsable(x_axis))
-                        X = int.Parse(x_axis);
-                    else
-                    {
-                        Console.WriteLine("You have to enter a number!!!");
-                        continue;
-                    }
-
-                    //check boundry of the game area for x
-                    if (X > 10 || X <= 0)
-                    {
-                        Console.WriteLine("You enter a number out of the coordinate!!");
-                        continue;
-                    }
-                    Console.WriteLine("Please enter Y start coordinate!");
-                    Console.Write("Y: ");
-                    var y_axis = Console.ReadLine();
-                    int Y;
-
-                    //only number input validation
-                    if (_game.isItParsable(y_axis))
-                        Y = int.Parse(y_axis);
-                    else
-                    {
-                        Console.WriteLine("You have to enter a number!!!");
-                        continue;
-                    }
-
-                    //check boundry of the game area for y
-                    if (Y > 10 || Y <= 0)
-                    {
-                        Console.WriteLine("You enter a number out of the coordinate!!");
-                        continue;
-                    }
-                    ship.LocationIndex = X-1;
-                    ship.StartIndex = Y-1;
+                    (ship.StartIndex, ship.LocationIndex) = takeStartCoordinates();
                 }
                 else if (verorhor == "2")
                 {
                     ship.VerorHor = false;
                     _logger.print($"{ship.Name} is horizontal.");
-                    Console.WriteLine("Please enter X coordinate!");
-                    Console.Write("X: ");
-                    var x_axis = Console.ReadLine();
-                    int X;
 
-                    //only number input validation
-                    if (int.TryParse(x_axis, out X))
-                    {
-                        X = int.Parse(x_axis);
-                    }
-                    else
-                    {
-                        Console.WriteLine("You have to enter a number!!!");
-                        continue;
-                    }
-
-                    //check boundry of the game area for x
-                    if (X > 10 || X <= 0)
-                    {
-                        Console.WriteLine("You enter a number out of the coordinate!!");
-                        continue;
-                    }
-                    Console.WriteLine("Please enter Y coordinate!");
-                    Console.Write("Y: ");
-                    var y_axis = Console.ReadLine();
-                    int Y;
-
-                    //only number input validation
-                    if (int.TryParse(y_axis, out Y))
-                    {
-                        Y = int.Parse(y_axis);
-                    }
-                    else
-                    {
-                        Console.WriteLine("You have to enter a number!!!");
-                        continue;
-                    }
-
-                    //check boundry of the game area for y
-                    if (Y > 10 || Y <= 0)
-                    {
-                        Console.WriteLine("You enter a number out of the coordinate!!");
-                        continue;
-                    }
-                    ship.LocationIndex = Y - 1;
-                    ship.StartIndex = X - 1;
+                    (ship.LocationIndex, ship.StartIndex) = takeStartCoordinates();
                 }
 
                 ship.EndIndex = ship.StartIndex + ship.Length;
@@ -198,7 +94,7 @@
                     Console.WriteLine($"You choose wrong start index for ship, the length of the ship is {ship.Length}. Please try again.");
                     continue;
                 }
-                //Horizontal and Vertical placement choice start
+                //Horizontal and Vertical placement choice end
 
                 _logger.print($"Random indexing is done for {ship.Name}");
 
@@ -221,6 +117,99 @@
                 }
             }
             _game.printUserGameArea(gameArea);
+        }
+
+        public string chooseShip(List<Ship> ships)
+        {
+            string shipId;
+            while(true)
+            {
+                Console.WriteLine("Choose the ship you want to place");
+                int i = 1;
+                foreach (Ship item in ships)
+                {
+                    if (item.isShipPlaced == true)
+                    {
+                        Console.WriteLine(i + ". " + item.Name + " X");
+                    }
+                    else
+                        Console.WriteLine(i + ". " + item.Name);
+                    i++;
+                }
+                Console.Write("Choice: ");
+                shipId = Console.ReadLine();
+                if (int.Parse(shipId) < 1 || int.Parse(shipId) > 6 || string.IsNullOrEmpty(shipId))
+                    continue;
+                break;
+            }
+            return shipId;
+        }
+
+        public string VerorHorChoice()
+        {
+            string verorhor;
+            while(true)
+            {
+                Console.WriteLine("Do you want to place horizontaly or verticaly\n1. Vertical\n2. Horizontal");
+                Console.Write("Choice: ");
+                verorhor = Console.ReadLine();
+                if (!_game.isItParsable(verorhor))
+                {
+                    Console.WriteLine("Invalid input!!");
+                    continue;
+                }
+                break;
+            }
+            return verorhor;
+        }
+
+        public (int,int) takeStartCoordinates()
+        {
+            int X;
+            int Y;
+            while (true)
+            {
+                Console.WriteLine("Please enter X start coordinate!");
+                Console.Write("X: ");
+                var x_axis = Console.ReadLine();
+
+                //only number input validation
+                if (_game.isItParsable(x_axis))
+                    X = int.Parse(x_axis);
+                else
+                {
+                    Console.WriteLine("You have to enter a number!!!");
+                    continue;
+                }
+
+                //check boundry of the game area for x
+                if (X > 10 || X <= 0)
+                {
+                    Console.WriteLine("You enter a number out of the coordinate!!");
+                    continue;
+                }
+                Console.WriteLine("Please enter Y start coordinate!");
+                Console.Write("Y: ");
+                var y_axis = Console.ReadLine();
+
+                //only number input validation
+                if (_game.isItParsable(y_axis))
+                    Y = int.Parse(y_axis);
+                else
+                {
+                    Console.WriteLine("You have to enter a number!!!");
+                    continue;
+                }
+
+                //check boundry of the game area for y
+                if (Y > 10 || Y <= 0)
+                {
+                    Console.WriteLine("You enter a number out of the coordinate!!");
+                    continue;
+                }
+                break;
+            }
+            return (X - 1, Y - 1);
         }
     }
 }
