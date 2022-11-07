@@ -40,7 +40,7 @@
                         continue;
                     if (gameArea[i, j] == 1)
                     {
-                        Console.WriteLine("Placement is blocked by ONE SQUARE RULE!!!");
+                        _logger.print("Placement is blocked by ONE SQUARE RULE!!!");
                         return true;
                     }
                 }
@@ -58,7 +58,7 @@
                         continue;
                     if (gameArea[j, i] == 1)
                     {
-                        Console.WriteLine("Placement is blocked by ONE SQUARE RULE!!!");
+                        _logger.print("Placement is blocked by ONE SQUARE RULE!!!");
                         return true;
                     }    
                 }
@@ -113,7 +113,7 @@
             while(true)
             {
                 Console.WriteLine("Please enter X coordinate!");
-                Console.Write("X: ");
+                _logger.inputer("X: ");
                 var x_axis = Console.ReadLine();
                 int X;
 
@@ -122,19 +122,19 @@
                     X = int.Parse(x_axis);
                 else
                 {
-                    Console.WriteLine("You have to enter a number!!!");
+                    _logger.printWarning("You have to enter a number!!!");
                     continue;
                 }
 
                 //check boundry of the game area for x
                 if (X > 10 || X <= 0)
                 {
-                    Console.WriteLine("You enter a number out of the coordinate!!");
+                    _logger.printWarning("You enter a number out of the coordinate!!");
                     continue;
                 }
 
                 Console.WriteLine("Please enter Y coordinate!");
-                Console.Write("Y: ");
+                _logger.inputer("Y: ");
                 var y_axis = Console.ReadLine();
                 int Y;
 
@@ -143,14 +143,14 @@
                     Y = int.Parse(y_axis);
                 else
                 {
-                    Console.WriteLine("You have to enter a number!!!");
+                    _logger.printWarning("You have to enter a number!!!");
                     continue;
                 }
 
                 //check boundry of the game area for y
                 if (Y > 10 || Y <= 0)
                 {
-                    Console.WriteLine("You enter a number out of the coordinate!!");
+                    _logger.printWarning("You enter a number out of the coordinate!!");
                     continue;
                 }
 
@@ -159,12 +159,14 @@
                 {
                     gameArea[X-1, Y-1] = 2;
                     roundCounter++;
-                    Console.WriteLine("You succesfully shoot!!");
+                    _logger.gamePrint("You succesfully shoot!!");
+                    printComputerGameArea(gameArea);
                     continue;
                 }
                 //already shot check
                 else if (gameArea[X-1, Y-1] == 2)
                 {
+                    printComputerGameArea(gameArea);
                     continue;
                 }
                 //already fail shot check
@@ -191,11 +193,13 @@
                 {
                     gameArea[X, Y] = 2;
                     roundCounter++;
+                    printUserGameArea(gameArea);
                     continue;
                 }
                 //already shot check
                 else if (gameArea[X, Y] == 2)
                 {
+                    printUserGameArea(gameArea);
                     continue;
                 }
                 //already fail shot check
@@ -258,6 +262,16 @@
             if (int.TryParse(number, out checker))
                 return true;
             return false;
+        }
+
+        public (string,string) nameAndSurnameInput()
+        {
+            _logger.inputer("First Name: ");
+            string firstname = Console.ReadLine();
+            _logger.inputer("Last Name: ");
+            string lastname = Console.ReadLine();
+
+            return (firstname, lastname);
         }
     }
 }
