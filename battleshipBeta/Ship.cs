@@ -10,6 +10,7 @@
         public bool VerorHor { get; set; }
         public int LocationIndex { get; set; }
         public bool isShipPlaced { get; set; }
+        public bool isShipSinked { get; set; }
 
         public Ship(int length, string? name, int id)
         {

@@ -2,7 +2,17 @@
 {
     internal class Game
     {
-        public int[,] gameArea;
+        //In the game area, 0 means there is no ship, 1 means there is ship but it was not shooted
+        //2 means there is a ship and it was shooted, 3 means there is no ship but it was fail shoot
+
+        public (int, int) lastSuccessIndex;
+        public (int, int) shipFoundStartPoint;
+
+        public bool isShipFound = false;
+        public bool lastShotSuccess;
+        public bool firstSuccessShotChecker = true;
+        public string direction;
+
         public int roundCounter = 0;
 
         private readonly Random _random;
@@ -17,7 +27,7 @@
         //creating game area
         public int[,] createGameArea()
         {
-            gameArea = new int[10, 10];
+            int [,] gameArea = new int[10, 10];
             for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 10; j++)
@@ -50,9 +60,9 @@
         //check overlap and one square rule for vertical placement
         public bool checkOneSquareRuleinVertical(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
         {
-            for (int i = locationIndex-1; i <= locationIndex+1 ; i++)
+            for (int i = locationIndex - 1; i <= locationIndex + 1; i++)
             {
-                for (int j = startIndex-1; j <= endIndex+1; j++)
+                for (int j = startIndex - 1; j <= endIndex + 1; j++)
                 {
                     if (i > 9 || i < 0 || j < 0 || j > 9)
                         continue;
@@ -60,7 +70,7 @@
                     {
                         _logger.print("Placement is blocked by ONE SQUARE RULE!!!");
                         return true;
-                    }    
+                    }
                 }
             }
             return false;
@@ -110,7 +120,7 @@
         //user shoot mechanism
         public void shoot(int[,] gameArea)
         {
-            while(true)
+            while (true)
             {
                 Console.WriteLine("Please enter X coordinate!");
                 _logger.inputer("X: ");
@@ -118,7 +128,7 @@
                 int X;
 
                 //only number input validation
-                if(isItParsable(x_axis))
+                if (isItParsable(x_axis))
                     X = int.Parse(x_axis);
                 else
                 {
@@ -155,61 +165,117 @@
                 }
 
                 //succesful shoot check
-                if (gameArea[X-1, Y-1] == 1)
+                if (gameArea[X - 1, Y - 1] == 1)
                 {
-                    gameArea[X-1, Y-1] = 2;
+                    gameArea[X - 1, Y - 1] = 2;
                     roundCounter++;
                     _logger.gamePrint("You succesfully shoot!!");
                     printComputerGameArea(gameArea);
                     continue;
                 }
                 //already shot check
-                else if (gameArea[X-1, Y-1] == 2)
+                else if (gameArea[X - 1, Y - 1] == 2)
                 {
                     printComputerGameArea(gameArea);
                     continue;
                 }
                 //already fail shot check
-                else if (gameArea[X-1, Y-1] == 3)
+                else if (gameArea[X - 1, Y - 1] == 3)
                     break;
                 //cross the fail shot
                 else
                 {
-                    gameArea[X-1, Y-1] = 3;
+                    gameArea[X - 1, Y - 1] = 3;
                     roundCounter++;
                     break;
-                } 
+                }
             }
         }
 
-        public void computerShoot(int[,] gameArea)
+        public (int, int) shootInRow(int X, int Y, int[,] userGameArea, string direction)
+        {
+            if (userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 2 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 3)
+            {
+                direction = "North";
+                return (getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2);
+            }
+            else if (userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 2 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 3)
+            {
+                direction = "South";
+                return (getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2);
+            }
+            else if (userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 2 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 3)
+            {
+                direction = "East";
+                return (getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2);
+            }
+            else if (userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 2 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 3)
+            {
+                direction = "West";
+                return (getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2);
+            }    
+            return (X, Y);
+        }
+
+        //computer shoot mechanism
+        public void computerShoot(int[,] userGameArea)
         {
             while(true)
             {
-                var X = _random.Next(10);
-                var Y = _random.Next(10);
-                //succesful shoot check
-                if (gameArea[X, Y] == 1)
+                int X;
+                int Y;
+
+                if (isShipFound == true && lastShotSuccess == true)
                 {
-                    gameArea[X, Y] = 2;
+                    if(direction == null)
+                        (X,Y) = shootInRow(lastSuccessIndex.Item1, lastSuccessIndex.Item2, userGameArea, direction);
+                }
+                else if(lastShotSuccess == false && isShipFound == true)
+                {
+                    (X,Y) = shipFoundStartPoint;
+                    (X,Y)  = shootInRow(X, Y, userGameArea, direction);
+                }
+                else if (isShipFound == false)
+                {
+                    X = _random.Next(10);
+                    Y = _random.Next(10);
+                }
+                else
+                    break;
+
+                //succesful shoot check
+                if (userGameArea[X, Y] == 1)
+                {
+                    userGameArea[X, Y] = 2;
                     roundCounter++;
-                    printUserGameArea(gameArea);
+                    printUserGameArea(userGameArea);
+                    lastSuccessIndex = (X, Y);
+                    lastShotSuccess = true;
+                    isShipFound = true;
+
+                    if(firstSuccessShotChecker == true)
+                    {
+                        shipFoundStartPoint = (X, Y);
+                        firstSuccessShotChecker = false;
+                    }
                     continue;
                 }
                 //already shot check
-                else if (gameArea[X, Y] == 2)
+                else if (userGameArea[X, Y] == 2)
                 {
-                    printUserGameArea(gameArea);
+                    printUserGameArea(userGameArea);
                     continue;
                 }
                 //already fail shot check
-                else if (gameArea[X, Y] == 3)
+                else if (userGameArea[X, Y] == 3)
                     break;
                 //cross the fail shot
                 else
                 {
-                    gameArea[X , Y] = 3;
+                    userGameArea[X , Y] = 3;
                     roundCounter++;
+                    lastShotSuccess = false;
+                    direction = null;
                     break;
                 }
             }
@@ -272,6 +338,26 @@
             string lastname = Console.ReadLine();
 
             return (firstname, lastname);
+        }
+
+        public (int, int) getNorthCoordinate(int X, int Y)
+        {
+            return (X, Y - 1);
+        }
+
+        public (int, int) getSouthCoordinate(int X, int Y)
+        {
+            return (X, Y + 1);
+        }
+
+        public (int, int) getEastCoordinate(int X, int Y)
+        {
+            return (X + 1, Y);
+        }
+
+        public (int, int) getWestCoordinate(int X, int Y)
+        {
+            return (X - 1, Y);
         }
     }
 }
