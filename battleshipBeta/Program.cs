@@ -102,11 +102,7 @@ while (true)
             DateTime startTime = DateTime.Now;
             while (true)
             {
-                Console.WriteLine("____________________________");
-                Console.WriteLine("Computer Game Area");
                 game.printComputerGameArea(computerGameArea);
-                Console.WriteLine("*****************************");
-                Console.WriteLine("User Game Area");
                 game.printUserGameArea(userGameArea);
                 game.shoot(computerGameArea);
                 game.computerShoot(userGameArea);

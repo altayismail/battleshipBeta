@@ -97,6 +97,8 @@
         //print computer game area
         public void printComputerGameArea(int[,] computerGameArea)
         {
+            Console.WriteLine("____________________________");
+            Console.WriteLine("Computer Game Area");
             for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 10; j++)
@@ -117,6 +119,8 @@
         //print user game area
         public void printUserGameArea(int[,] userGameArea)
         {
+            Console.WriteLine("*****************************");
+            Console.WriteLine("User Game Area");
             for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 10; j++)
@@ -294,7 +298,6 @@
                 if (X > 10 || X < 0 || Y > 10 || Y < 0)
                 {
                     lastShootedIndex = shipFoundStartPoint;
-                    continue;
                 }
 
                 //succesful shoot check
