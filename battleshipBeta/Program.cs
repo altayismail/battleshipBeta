@@ -1,10 +1,13 @@
 ﻿using battleshipBeta;
+using battleshipBeta.Database;
+using battleshipBeta.Entities;
 
 Random random = new Random();
 Logger logger = new Logger();
 Game game = new Game(random, logger);
 Placement placement = new Placement(game, logger, random);
-Excel excel = new Excel(logger);
+Context context = new Context();
+Score score = new Score(context);
 
 List<Ship> userShips = game.getListOfUserShip(game.userAdmiral, game.userCruiser, game.userDestroyer, game.userDestroyer2, game.userAssault);
 int[,] computerGameArea = game.createGameArea();
@@ -15,19 +18,6 @@ placement.placementMechanism(computerGameArea, game.destroyer);
 placement.placementMechanism(computerGameArea, game.destroyer2);
 placement.placementMechanism(computerGameArea, game.assault);
 
-Console.WriteLine("____________________________");
-Console.WriteLine("Game Cheat Sheeat");
-
-for (int i = 0; i < 10; i++)
-{
-    for (int j = 0; j < 10; j++)
-    {
-        Console.Write(computerGameArea[j, i] + " ");
-    }
-    Console.Write("\n");
-}
-
-Console.WriteLine("_________________________");
 Console.WriteLine("Welcome To Battle Ship!!!!");
 while (true)
 {  
@@ -66,11 +56,12 @@ while (true)
                     break;
                 }
             }
+
             DateTime endTime_traning = DateTime.Now;
-            double duration_traning = (endTime_traning.Minute - startTime_traning.Minute);
-
-            excel.writeTraningExcelFile(t_firstname, t_lastname, 35);
-
+            double duration = (startTime_traning - endTime_traning).TotalMinutes;
+            ExcelObjectTuttorial T_score = new ExcelObjectTuttorial()
+                { Firstname = t_firstname, Lastname = t_lastname, Duration = duration };
+            score.createScoreforTuttorial(T_score);
             continue;
         case "2":
             Console.WriteLine("Welcome to the AI Mode...");
@@ -121,21 +112,18 @@ while (true)
                     break;
                 }
             }
+
             DateTime endTime = DateTime.Now;
-            double duration = (endTime.Minute - startTime.Minute);
-
-            excel.writeAIExcelFile(ai_firstname, ai_lastname, "Easy", duration);
-
+            double ai_duration = (endTime - startTime).TotalMinutes;
+            ExcelObjectAI ai_score = new ExcelObjectAI()
+                { Firstname = ai_firstname, Lastname = ai_lastname, Duration = ai_duration, Mode = "Hard" };
+            score.createScoreforAI(ai_score);
             continue;
         case "3":
-            excel.readTraningExcelFile();
+            score.getListOfTuttorialScore();
             continue;
         case "4":
-            excel.readAIExcelFile();
-            continue;
-        case "6":
-            var (name, surname) = game.nameAndSurnameInput();
-            excel.writeTraningExcelFile(name, surname, 9);
+            score.getListOfAIScore();
             continue;
         default:
             Console.WriteLine("Please enter valid choice!!!");
@@ -143,3 +131,16 @@ while (true)
     }
 }
 Console.WriteLine("You have successfully exit.");
+
+
+//Console.WriteLine("____________________________");
+//Console.WriteLine("Game Cheat Sheeat");
+
+//for (int i = 0; i < 10; i++)
+//{
+//    for (int j = 0; j < 10; j++)
+//    {
+//        Console.Write(computerGameArea[j, i] + " ");
+//    }
+//    Console.Write("\n");
+//}

@@ -1,4 +1,6 @@
-﻿namespace battleshipBeta
+﻿using battleshipBeta.Entities;
+
+namespace battleshipBeta
 {
     internal class Placement
     {

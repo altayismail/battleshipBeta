@@ -1,4 +1,4 @@
-﻿namespace battleshipBeta
+﻿namespace battleshipBeta.Entities
 {
     internal class Ship
     {
