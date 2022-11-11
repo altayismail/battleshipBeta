@@ -21,7 +21,11 @@
         public Ship destroyer2 = new Ship(3, "Destroyer2", 4);
         public Ship assault = new Ship(2, "Assault", 5);
 
-        public List<Ship> shipList = new List<Ship>();
+        public Ship userAdmiral = new Ship(5, "User Admiral", 1);
+        public Ship userCruiser = new Ship(4, "User Cruiser", 2);
+        public Ship userDestroyer = new Ship(3, "User Destroyer", 3);
+        public Ship userDestroyer2 = new Ship(3, "User Destroyer2", 4);
+        public Ship userAssault = new Ship(2, "User Assault", 5);
 
         private readonly Random _random;
         private readonly Logger _logger;
@@ -32,8 +36,9 @@
             _logger = logger;
         }
 
-        public List<Ship> getListOfShip(Ship admiral, Ship Cruiser, Ship Destroyer, Ship Destroyer2, Ship Assault)
+        public List<Ship> getListOfUserShip(Ship admiral, Ship Cruiser, Ship Destroyer, Ship Destroyer2, Ship Assault)
         {
+            List<Ship> shipList = new List<Ship>();
             shipList.Add(admiral);
             shipList.Add(Cruiser);
             shipList.Add(Destroyer);
@@ -216,37 +221,49 @@
 
         public (int, int) shootInRow(int X, int Y, int[,] userGameArea)
         {
-            if (userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 2 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 3)
+            if(!(Y - 1 < 0))
             {
-                direction = "North";
-                return (getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2);
+                if (userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 2 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 3)
+                {
+                    direction = "North";
+                    return (getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2);
+                }
             }
-            else if (userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 2 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 3)
+            if(!(Y + 1 > 10))
             {
-                direction = "South";
-                return (getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2);
+                if (userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 2 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 3)
+                {
+                    direction = "South";
+                    return (getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2);
+                }
             }
-            else if (userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 2 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 3)
+            if(!(X + 1 > 10))
             {
-                direction = "East";
-                return (getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2);
+                if (userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 2 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 3)
+                {
+                    direction = "East";
+                    return (getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2);
+                }
             }
-            else if (userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 2 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 3)
+            if(!(X - 1 < 0))
             {
-                direction = "West";
-                return (getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2);
-            }    
+                if (userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 2 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 3)
+                {
+                    direction = "West";
+                    return (getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2);
+                }
+            }
             return (X, Y);
         }
 
         public void checkShipIsFullySinked(List<Ship> ships, int[,] gameArea)
         {
-            foreach (var ship in ships.Where(x => x.isShipSinked == false).ToList())
+            foreach (var ship in ships.Where(x => x.isShipSinked == false).ToList<Ship>())
             {
                 int shipSinkCounter = 0;
-                for (int i = 0; i <= ship.Length; i++)
+                for (int i = 0; i < ship.Length; i++)
                 {
-                    if (gameArea[ship.XLocations[i], ship.YLocations[i]] == 2)
+                    if (gameArea[ship.YLocations[i],ship.XLocations[i]] == 2)
                         shipSinkCounter++;
                 }
 
@@ -254,19 +271,22 @@
                 {
                     isShipFound = false;
                     ship.isShipSinked = true;
+                    direction = null;
+                    lastShotSuccess = false;
+                    firstSuccessShotChecker = true;
                 }
             }
         }
 
         //computer shoot mechanism
-        public void computerShoot(int[,] userGameArea)
+        public void computerShoot(int[,] userGameArea, List<Ship> ships)
         {
             while(true)
             {
                 int X;
                 int Y;
 
-                checkShipIsFullySinked(shipList, userGameArea);
+                checkShipIsFullySinked(ships, userGameArea);
 
                 if (isShipFound == true && lastShotSuccess == true && direction == null)
                     (X, Y) = shootInRow(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
@@ -295,11 +315,6 @@
                     Y = _random.Next(10);
                 }
 
-                if (X > 10 || X < 0 || Y > 10 || Y < 0)
-                {
-                    lastShootedIndex = shipFoundStartPoint;
-                }
-
                 //succesful shoot check
                 if (userGameArea[X, Y] == 1)
                 {
@@ -325,7 +340,7 @@
                 }
                 //already fail shot check
                 else if (userGameArea[X, Y] == 3)
-                    break;
+                    continue;
                 //cross the fail shot
                 else
                 {

@@ -6,7 +6,7 @@ Game game = new Game(random, logger);
 Placement placement = new Placement(game, logger, random);
 Excel excel = new Excel(logger);
 
-List<Ship> ships = game.getListOfShip(game.admiral, game.cruiser, game.destroyer, game.destroyer2, game.assault);
+List<Ship> userShips = game.getListOfUserShip(game.userAdmiral, game.userCruiser, game.userDestroyer, game.userDestroyer2, game.userAssault);
 int[,] computerGameArea = game.createGameArea();
 
 placement.placementMechanism(computerGameArea, game.admiral);
@@ -85,17 +85,17 @@ while (true)
 
             if(placement_type_choice == "y")
             {
-                placement.placementMechanism(userGameArea, game.admiral);
-                placement.placementMechanism(userGameArea, game.cruiser);
-                placement.placementMechanism(userGameArea, game.destroyer);
-                placement.placementMechanism(userGameArea, game.destroyer2);
-                placement.placementMechanism(userGameArea, game.assault);
+                placement.placementMechanism(userGameArea, game.userAdmiral);
+                placement.placementMechanism(userGameArea, game.userCruiser);
+                placement.placementMechanism(userGameArea, game.userDestroyer);
+                placement.placementMechanism(userGameArea, game.userDestroyer2);
+                placement.placementMechanism(userGameArea, game.userAssault);
             }
             else if(placement_type_choice == "n")
             {
-                for (int i = 0; i < ships.Count; i++)
+                for (int i = 0; i < userShips.Count; i++)
                 {
-                    placement.placementMechanismForUser(userGameArea, ships);
+                    placement.placementMechanismForUser(userGameArea, userShips);
                 }
             }
 
@@ -105,7 +105,7 @@ while (true)
                 game.printComputerGameArea(computerGameArea);
                 game.printUserGameArea(userGameArea);
                 game.shoot(computerGameArea);
-                game.computerShoot(userGameArea);
+                game.computerShoot(userGameArea, userShips);
                 if (game.checkAllShipsAreFound(computerGameArea) == 17 || game.checkAllShipsAreFound(userGameArea) == 17)
                 {
                     logger.gamePrint("Congrats, you found all the ships!!!");
