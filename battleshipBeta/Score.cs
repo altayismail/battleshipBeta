@@ -40,7 +40,7 @@ namespace battleshipBeta
             {
                 Console.Write(score.Firstname + "\t\t");
                 Console.Write(score.Lastname + "\t\t");
-                Console.Write(score.Duration + "\n");
+                Console.Write(string.Format("{0:0.00}", score.Duration) + "\n");
             }
             Console.WriteLine("______________________________");
         }
@@ -52,7 +52,7 @@ namespace battleshipBeta
                 .OrderBy(x => x.Duration)
                 .Take(5);
 
-            Console.WriteLine("Score List of Tuttorial Mode");
+            Console.WriteLine("Score List of AI Mode");
             Console.WriteLine("FIRSTNAME       LASTNAME        MODE            DURATION (min)");
             Console.WriteLine("______________________________________________________________");
             foreach (var score in scores)
@@ -60,7 +60,7 @@ namespace battleshipBeta
                 Console.Write(score.Firstname + "\t\t");
                 Console.Write(score.Lastname + "\t\t");
                 Console.Write(score.Mode + "\t\t");
-                Console.Write(score.Duration + "\n");
+                Console.Write(string.Format("{0:0.00}", score.Duration) + "\n");
             }
             Console.WriteLine("______________________________");
         }

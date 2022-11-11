@@ -10,20 +10,19 @@ Context context = new Context();
 Score score = new Score(context);
 
 List<Ship> userShips = game.getListOfUserShip(game.userAdmiral, game.userCruiser, game.userDestroyer, game.userDestroyer2, game.userAssault);
+List<Ship> computerShips = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
 int[,] computerGameArea = game.createGameArea();
 
-placement.placementMechanism(computerGameArea, game.admiral);
-placement.placementMechanism(computerGameArea, game.cruiser);
-placement.placementMechanism(computerGameArea, game.destroyer);
-placement.placementMechanism(computerGameArea, game.destroyer2);
-placement.placementMechanism(computerGameArea, game.assault);
+placement.placementMechanism(computerGameArea, game.computerAdmiral);
+placement.placementMechanism(computerGameArea, game.computerCruiser);
+placement.placementMechanism(computerGameArea, game.computerDestroyer);
+placement.placementMechanism(computerGameArea, game.comptuerDestroyer2);
+placement.placementMechanism(computerGameArea, game.computerAssault);
 
 Console.WriteLine("Welcome To Battle Ship!!!!");
 while (true)
-{  
-    Console.WriteLine("Please select the game mode");
-    Console.WriteLine("____________________________");
-    Console.WriteLine("1. Traning Mode\n2. AI Mode\n3. Past Results of Traning Mode\n4. Past Result of AI Mode\n5. Quit");
+{
+    menuScript();
     logger.inputer("Choice: ");
     var gameModeChoice = Console.ReadLine();
     if (gameModeChoice == "5")
@@ -37,12 +36,12 @@ while (true)
             Console.WriteLine("____________________________");
             var (t_firstname, t_lastname) = game.nameAndSurnameInput();
 
-            DateTime startTime_traning = DateTime.Now;
+            DateTime t_startTime = DateTime.Now;
             while (true)
             {
                 Console.WriteLine("____________________________");
                 game.printComputerGameArea(computerGameArea);
-                game.shoot(computerGameArea);
+                game.userShoot(computerGameArea, computerShips);
                 if (game.checkAllShipsAreFound(computerGameArea) == 17)
                 {
                     logger.gamePrint("Congrats, you found all the ships!!!");
@@ -57,10 +56,10 @@ while (true)
                 }
             }
 
-            DateTime endTime_traning = DateTime.Now;
-            double duration = (startTime_traning - endTime_traning).TotalMinutes;
+            DateTime t_endTime = DateTime.Now;
+            double t_duration = (t_endTime - t_startTime).TotalMinutes;
             ExcelObjectTuttorial T_score = new ExcelObjectTuttorial()
-                { Firstname = t_firstname, Lastname = t_lastname, Duration = duration };
+                { Firstname = t_firstname, Lastname = t_lastname, Duration = t_duration };
             score.createScoreforTuttorial(T_score);
             continue;
         case "2":
@@ -90,31 +89,31 @@ while (true)
                 }
             }
 
-            DateTime startTime = DateTime.Now;
+            DateTime ai_startTime = DateTime.Now;
             while (true)
             {
                 game.printComputerGameArea(computerGameArea);
                 game.printUserGameArea(userGameArea);
-                game.shoot(computerGameArea);
+                game.userShoot(computerGameArea, computerShips);
                 game.computerShoot(userGameArea, userShips);
                 if (game.checkAllShipsAreFound(computerGameArea) == 17 || game.checkAllShipsAreFound(userGameArea) == 17)
                 {
                     logger.gamePrint("Congrats, you found all the ships!!!");
                     game.printComputerGameArea(computerGameArea);
-                    game.printComputerGameArea(userGameArea);
+                    game.printUserGameArea(userGameArea);
                     break;
                 }
                 if (game.roundCounter == 200)
                 {
                     logger.gamePrint("Congrats, you found all the ships!!!");
                     game.printComputerGameArea(computerGameArea);
-                    game.printComputerGameArea(userGameArea);
+                    game.printUserGameArea(userGameArea);
                     break;
                 }
             }
 
-            DateTime endTime = DateTime.Now;
-            double ai_duration = (endTime - startTime).TotalMinutes;
+            DateTime ai_endTime = DateTime.Now;
+            double ai_duration = (ai_endTime - ai_startTime).TotalMinutes;
             ExcelObjectAI ai_score = new ExcelObjectAI()
                 { Firstname = ai_firstname, Lastname = ai_lastname, Duration = ai_duration, Mode = "Hard" };
             score.createScoreforAI(ai_score);
@@ -131,7 +130,12 @@ while (true)
     }
 }
 Console.WriteLine("You have successfully exit.");
-
+void menuScript()
+{
+    Console.WriteLine("Please select the game mode");
+    Console.WriteLine("____________________________");
+    Console.WriteLine("1. Traning Mode\n2. AI Mode\n3. Past Results of Traning Mode\n4. Past Result of AI Mode\n5. Quit");
+}
 
 //Console.WriteLine("____________________________");
 //Console.WriteLine("Game Cheat Sheeat");

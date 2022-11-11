@@ -6,6 +6,7 @@ namespace battleshipBeta
     {
         //In the game area, 0 means there is no ship, 1 means there is ship but it was not shooted
         //2 means there is a ship and it was shooted, 3 means there is no ship but it was fail shoot
+        //verorhor variable means false is vertical placement, true is horizontal placement
 
         public (int, int) lastShootedIndex;
         public (int, int) shipFoundStartPoint;
@@ -17,11 +18,11 @@ namespace battleshipBeta
 
         public int roundCounter = 0;
 
-        public Ship admiral = new Ship(5, "Admiral", 1);
-        public Ship cruiser = new Ship(4, "Cruiser", 2);
-        public Ship destroyer = new Ship(3, "Destroyer", 3);
-        public Ship destroyer2 = new Ship(3, "Destroyer2", 4);
-        public Ship assault = new Ship(2, "Assault", 5);
+        public Ship computerAdmiral = new Ship(5, "Computer Admiral", 1);
+        public Ship computerCruiser = new Ship(4, "Computer Cruiser", 2);
+        public Ship computerDestroyer = new Ship(3, "Computer Destroyer", 3);
+        public Ship comptuerDestroyer2 = new Ship(3, "Computer Destroyer2", 4);
+        public Ship computerAssault = new Ship(2, "Computer Assault", 5);
 
         public Ship userAdmiral = new Ship(5, "User Admiral", 1);
         public Ship userCruiser = new Ship(4, "User Cruiser", 2);
@@ -38,6 +39,19 @@ namespace battleshipBeta
             _logger = logger;
         }
 
+        //get list of user ships
+        public List<Ship> getListOfComputerShip(Ship admiral, Ship Cruiser, Ship Destroyer, Ship Destroyer2, Ship Assault)
+        {
+            List<Ship> shipListComputer = new List<Ship>();
+            shipListComputer.Add(admiral);
+            shipListComputer.Add(Cruiser);
+            shipListComputer.Add(Destroyer);
+            shipListComputer.Add(Destroyer2);
+            shipListComputer.Add(Assault);
+            return shipListComputer;
+        }
+
+        //get list of user ships
         public List<Ship> getListOfUserShip(Ship admiral, Ship Cruiser, Ship Destroyer, Ship Destroyer2, Ship Assault)
         {
             List<Ship> shipList = new List<Ship>();
@@ -82,6 +96,7 @@ namespace battleshipBeta
             }
             return false;
         }
+
         //check overlap and one square rule for vertical placement
         public bool checkOneSquareRuleinVertical(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
         {
@@ -101,56 +116,30 @@ namespace battleshipBeta
             return false;
         }
 
-        //print computer game area
-        public void printComputerGameArea(int[,] computerGameArea)
+        //this function place the ships to game are in horizontal
+        public void horizontalPlacement(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
         {
-            Console.WriteLine("____________________________");
-            Console.WriteLine("Computer Game Area");
-            for (int i = 0; i < 10; i++)
+            for (int i = startIndex; i < endIndex; i++)
             {
-                for (int j = 0; j < 10; j++)
-                {
-                    if (computerGameArea[j, i] == 0)
-                        Console.Write("0 ");
-                    else if (computerGameArea[j, i] == 1)
-                        Console.Write("0 ");
-                    else if (computerGameArea[j, i] == 3)
-                        Console.Write("X ");
-                    else
-                        Console.Write("S ");
-                }
-                Console.Write("\n");
+                gameArea[locationIndex, i] = 1;
             }
-            Console.WriteLine("_________________________");
         }
-        //print user game area
-        public void printUserGameArea(int[,] userGameArea)
+
+        //this function place the ships to game are in vertical
+        public void verticalPlacement(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
         {
-            Console.WriteLine("*****************************");
-            Console.WriteLine("User Game Area");
-            for (int i = 0; i < 10; i++)
+            for (int i = startIndex; i < endIndex; i++)
             {
-                for (int j = 0; j < 10; j++)
-                {
-                    if (userGameArea[j, i] == 0)
-                        Console.Write("0 ");
-                    else if (userGameArea[j, i] == 1)
-                        Console.Write("* ");
-                    else if (userGameArea[j, i] == 3)
-                        Console.Write("X ");
-                    else
-                        Console.Write("S ");
-                }
-                Console.Write("\n");
+                gameArea[i, locationIndex] = 1;
             }
-            Console.WriteLine("_________________________");
         }
 
         //user shoot mechanism
-        public void shoot(int[,] gameArea)
+        public void userShoot(int[,] computerGameArea, List<Ship> computerShips)
         {
             while (true)
             {
+                checkShipIsFullySinked(computerShips, computerGameArea);
                 Console.WriteLine("Please enter X coordinate!");
                 _logger.inputer("X: ");
                 var x_axis = Console.ReadLine();
@@ -194,33 +183,34 @@ namespace battleshipBeta
                 }
 
                 //succesful shoot check
-                if (gameArea[X - 1, Y - 1] == 1)
+                if (computerGameArea[X - 1, Y - 1] == 1)
                 {
-                    gameArea[X - 1, Y - 1] = 2;
+                    computerGameArea[X - 1, Y - 1] = 2;
                     roundCounter++;
                     _logger.gamePrint("You succesfully shoot!!");
-                    printComputerGameArea(gameArea);
+                    printComputerGameArea(computerGameArea);
                     continue;
                 }
                 //already shot check
-                else if (gameArea[X - 1, Y - 1] == 2)
+                else if (computerGameArea[X - 1, Y - 1] == 2)
                 {
-                    printComputerGameArea(gameArea);
+                    printComputerGameArea(computerGameArea);
                     continue;
                 }
                 //already fail shot check
-                else if (gameArea[X - 1, Y - 1] == 3)
+                else if (computerGameArea[X - 1, Y - 1] == 3)
                     break;
                 //cross the fail shot
                 else
                 {
-                    gameArea[X - 1, Y - 1] = 3;
+                    computerGameArea[X - 1, Y - 1] = 3;
                     roundCounter++;
                     break;
                 }
             }
         }
 
+        //this function is focus on when it founds a success shot and try to find other piece of ship
         public (int, int) shootInRow(int X, int Y, int[,] userGameArea)
         {
             if(!(Y - 1 < 0))
@@ -258,6 +248,7 @@ namespace battleshipBeta
             return (X, Y);
         }
 
+        //this mechanism checks every round, if there is a sinked ship
         public void checkShipIsFullySinked(List<Ship> ships, int[,] gameArea)
         {
             foreach (var ship in ships.Where(x => x.isShipSinked == false).ToList<Ship>())
@@ -281,14 +272,14 @@ namespace battleshipBeta
         }
 
         //computer shoot mechanism
-        public void computerShoot(int[,] userGameArea, List<Ship> ships)
+        public void computerShoot(int[,] userGameArea, List<Ship> userShips)
         {
             while(true)
             {
                 int X;
                 int Y;
 
-                checkShipIsFullySinked(ships, userGameArea);
+                checkShipIsFullySinked(userShips, userGameArea);
 
                 if (isShipFound == true && lastShotSuccess == true && direction == null)
                     (X, Y) = shootInRow(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
@@ -355,6 +346,53 @@ namespace battleshipBeta
             }
         }
 
+        //print computer game area
+        public void printComputerGameArea(int[,] computerGameArea)
+        {
+            Console.WriteLine("____________________________");
+            Console.WriteLine("Computer Game Area");
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    if (computerGameArea[j, i] == 0)
+                        Console.Write("0 ");
+                    else if (computerGameArea[j, i] == 1)
+                        Console.Write("0 ");
+                    else if (computerGameArea[j, i] == 3)
+                        Console.Write("X ");
+                    else
+                        Console.Write("S ");
+                }
+                Console.Write("\n");
+            }
+            Console.WriteLine("_________________________");
+        }
+
+        //print user game area
+        public void printUserGameArea(int[,] userGameArea)
+        {
+            Console.WriteLine("*****************************");
+            Console.WriteLine("User Game Area");
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    if (userGameArea[j, i] == 0)
+                        Console.Write("0 ");
+                    else if (userGameArea[j, i] == 1)
+                        Console.Write("* ");
+                    else if (userGameArea[j, i] == 3)
+                        Console.Write("X ");
+                    else
+                        Console.Write("S ");
+                }
+                Console.Write("\n");
+            }
+            Console.WriteLine("_________________________");
+        }
+
+        //this function checks if all ships are found and help to end game
         public int checkAllShipsAreFound(int[,] gameArea)
         {
             List<int> oneDimension = new List<int>();
@@ -365,22 +403,7 @@ namespace battleshipBeta
             return oneDimension.Count(x => x.Equals(2));
         }
 
-        public void horizontalPlacement(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
-        {
-            for (int i = startIndex; i < endIndex; i++)
-            {
-                gameArea[locationIndex, i] = 1;
-            }
-        }
-
-        public void verticalPlacement(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
-        {
-            for (int i = startIndex; i < endIndex; i++)
-            {
-                gameArea[i, locationIndex] = 1;
-            }
-        }
-
+        //this is a helper function for srandom ship placement
         public (int,int,int) randomIndexing(int shipLength)
         {
             var locationIndex = _random.Next(10);
@@ -396,6 +419,7 @@ namespace battleshipBeta
             return (locationIndex,startIndex,endIndex);
         }
 
+        //this function checks if the value is parsable so that app should not crash
         public bool isItParsable(string number)
         {
             int checker;
@@ -404,6 +428,7 @@ namespace battleshipBeta
             return false;
         }
 
+        //there are couple of time to take this input
         public (string,string) nameAndSurnameInput()
         {
             _logger.inputer("First Name: ");
@@ -414,6 +439,7 @@ namespace battleshipBeta
             return (firstname, lastname);
         }
 
+        //these functions are return the coordinate index according to the direction
         public (int, int) getNorthCoordinate(int X, int Y)
         {
             return (X, Y - 1);
