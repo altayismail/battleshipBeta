@@ -36,6 +36,8 @@
                     ship.VerorHor = false;
                 }
 
+                setShipLocation( ship );
+
                 //check vertical or horizontal placement
                 if (ship.VerorHor == true)
                 {
@@ -50,6 +52,26 @@
                         continue;
                     _game.verticalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
                     break;
+                }
+            }
+        }
+
+        public void setShipLocation(Ship ship)
+        {
+            if (ship.VerorHor == false)
+            {
+                for (int i = ship.StartIndex; i < ship.EndIndex; i++)
+                {
+                    ship.XLocations.Add(i);
+                    ship.YLocations.Add(ship.LocationIndex);
+                }
+            }
+            else
+            {
+                for (int i = ship.StartIndex; i < ship.EndIndex; i++)
+                {
+                    ship.XLocations.Add(ship.LocationIndex);
+                    ship.YLocations.Add(i);
                 }
             }
         }

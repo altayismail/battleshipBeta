@@ -5,7 +5,7 @@
         //In the game area, 0 means there is no ship, 1 means there is ship but it was not shooted
         //2 means there is a ship and it was shooted, 3 means there is no ship but it was fail shoot
 
-        public (int, int) lastSuccessIndex;
+        public (int, int) lastShootedIndex;
         public (int, int) shipFoundStartPoint;
 
         public bool isShipFound = false;
@@ -15,6 +15,14 @@
 
         public int roundCounter = 0;
 
+        public Ship admiral = new Ship(5, "Admiral", 1);
+        public Ship cruiser = new Ship(4, "Cruiser", 2);
+        public Ship destroyer = new Ship(3, "Destroyer", 3);
+        public Ship destroyer2 = new Ship(3, "Destroyer2", 4);
+        public Ship assault = new Ship(2, "Assault", 5);
+
+        public List<Ship> shipList = new List<Ship>();
+
         private readonly Random _random;
         private readonly Logger _logger;
 
@@ -22,6 +30,16 @@
         {
             _random = random;
             _logger = logger;
+        }
+
+        public List<Ship> getListOfShip(Ship admiral, Ship Cruiser, Ship Destroyer, Ship Destroyer2, Ship Assault)
+        {
+            shipList.Add(admiral);
+            shipList.Add(Cruiser);
+            shipList.Add(Destroyer);
+            shipList.Add(Destroyer2);
+            shipList.Add(Assault);
+            return shipList;
         }
 
         //creating game area
@@ -192,7 +210,7 @@
             }
         }
 
-        public (int, int) shootInRow(int X, int Y, int[,] userGameArea, string direction)
+        public (int, int) shootInRow(int X, int Y, int[,] userGameArea)
         {
             if (userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 2 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 3)
             {
@@ -217,6 +235,25 @@
             return (X, Y);
         }
 
+        public void checkShipIsFullySinked(List<Ship> ships, int[,] gameArea)
+        {
+            foreach (var ship in ships.Where(x => x.isShipSinked == false).ToList())
+            {
+                int shipSinkCounter = 0;
+                for (int i = 0; i <= ship.Length; i++)
+                {
+                    if (gameArea[ship.XLocations[i], ship.YLocations[i]] == 2)
+                        shipSinkCounter++;
+                }
+
+                if (shipSinkCounter == ship.Length)
+                {
+                    isShipFound = false;
+                    ship.isShipSinked = true;
+                }
+            }
+        }
+
         //computer shoot mechanism
         public void computerShoot(int[,] userGameArea)
         {
@@ -225,23 +262,40 @@
                 int X;
                 int Y;
 
-                if (isShipFound == true && lastShotSuccess == true)
+                checkShipIsFullySinked(shipList, userGameArea);
+
+                if (isShipFound == true && lastShotSuccess == true && direction == null)
+                    (X, Y) = shootInRow(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
+                else if (lastShotSuccess == false && isShipFound == true && direction == null)
                 {
-                    if(direction == null)
-                        (X,Y) = shootInRow(lastSuccessIndex.Item1, lastSuccessIndex.Item2, userGameArea, direction);
-                }
-                else if(lastShotSuccess == false && isShipFound == true)
-                {
-                    (X,Y) = shipFoundStartPoint;
-                    (X,Y)  = shootInRow(X, Y, userGameArea, direction);
+                    (X, Y) = shipFoundStartPoint;
+                    (X, Y) = shootInRow(X, Y, userGameArea);
                 }
                 else if (isShipFound == false)
                 {
                     X = _random.Next(10);
                     Y = _random.Next(10);
                 }
+                //after the first shoot, computer decides which way it should try
+                else if (direction == "North")
+                    (X, Y) = getNorthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                else if (direction == "South")
+                    (X, Y) = getSouthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                else if (direction == "East")
+                    (X, Y) = getEastCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                else if (direction == "West")
+                    (X, Y) = getWestCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
                 else
-                    break;
+                {
+                    X = _random.Next(10);
+                    Y = _random.Next(10);
+                }
+
+                if (X > 10 || X < 0 || Y > 10 || Y < 0)
+                {
+                    lastShootedIndex = shipFoundStartPoint;
+                    continue;
+                }
 
                 //succesful shoot check
                 if (userGameArea[X, Y] == 1)
@@ -249,7 +303,7 @@
                     userGameArea[X, Y] = 2;
                     roundCounter++;
                     printUserGameArea(userGameArea);
-                    lastSuccessIndex = (X, Y);
+                    lastShootedIndex = (X, Y);
                     lastShotSuccess = true;
                     isShipFound = true;
 

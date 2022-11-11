@@ -11,6 +11,8 @@
         public int LocationIndex { get; set; }
         public bool isShipPlaced { get; set; }
         public bool isShipSinked { get; set; }
+        public List<int> XLocations { get; set; } = new List<int>();
+        public List<int> YLocations { get; set; } = new List<int>();
 
         public Ship(int length, string? name, int id)
         {
