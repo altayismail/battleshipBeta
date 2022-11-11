@@ -58,25 +58,7 @@
             }
         }
 
-        public void setShipLocation(Ship ship)
-        {
-            if (ship.VerorHor == false)
-            {
-                for (int i = ship.StartIndex; i < ship.EndIndex; i++)
-                {
-                    ship.XLocations.Add(ship.LocationIndex);
-                    ship.YLocations.Add(i);
-                }
-            }
-            else
-            {
-                for (int i = ship.StartIndex; i < ship.EndIndex; i++)
-                {
-                    ship.XLocations.Add(i);
-                    ship.YLocations.Add(ship.LocationIndex);
-                }
-            }
-        }
+        
 
         public void placementMechanismForUser(int[,] gameArea, List<Ship> ships)
         {
@@ -234,6 +216,26 @@
                 break;
             }
             return (X - 1, Y - 1);
+        }
+
+        public void setShipLocation(Ship ship)
+        {
+            if (ship.VerorHor == false)
+            {
+                for (int i = ship.StartIndex; i < ship.EndIndex; i++)
+                {
+                    ship.XLocations.Add(ship.LocationIndex);
+                    ship.YLocations.Add(i);
+                }
+            }
+            else
+            {
+                for (int i = ship.StartIndex; i < ship.EndIndex; i++)
+                {
+                    ship.XLocations.Add(i);
+                    ship.YLocations.Add(ship.LocationIndex);
+                }
+            }
         }
     }
 }
