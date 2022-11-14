@@ -16,7 +16,8 @@ namespace battleshipBeta
         public bool firstSuccessShotChecker = true;
         public string direction;
 
-        public int roundCounter = 0;
+        public int computerRoundCounter = 1;
+        public int userRoundCounter = 1;
 
         public Ship computerAdmiral = new Ship(5, "Computer Admiral", 1);
         public Ship computerCruiser = new Ship(4, "Computer Cruiser", 2);
@@ -186,7 +187,7 @@ namespace battleshipBeta
                 if (computerGameArea[X - 1, Y - 1] == 1)
                 {
                     computerGameArea[X - 1, Y - 1] = 2;
-                    roundCounter++;
+                    userRoundCounter++;
                     _logger.gamePrint("You succesfully shoot!!");
                     printComputerGameArea(computerGameArea);
                     continue;
@@ -204,7 +205,7 @@ namespace battleshipBeta
                 else
                 {
                     computerGameArea[X - 1, Y - 1] = 3;
-                    roundCounter++;
+                    userRoundCounter++;
                     break;
                 }
             }
@@ -312,7 +313,7 @@ namespace battleshipBeta
                 if (userGameArea[X, Y] == 1)
                 {
                     userGameArea[X, Y] = 2;
-                    roundCounter++;
+                    computerRoundCounter++;
                     printUserGameArea(userGameArea);
                     lastShootedIndex = (X, Y);
                     lastShotSuccess = true;
@@ -338,7 +339,7 @@ namespace battleshipBeta
                 else
                 {
                     userGameArea[X , Y] = 3;
-                    roundCounter++;
+                    computerRoundCounter++;
                     lastShotSuccess = false;
                     direction = null;
                     break;
@@ -458,6 +459,60 @@ namespace battleshipBeta
         public (int, int) getWestCoordinate(int X, int Y)
         {
             return (X - 1, Y);
+        }
+
+        public bool checkUserWin(int[,] computerGameArea, string firstname, string lastname)
+        {
+            if (checkAllShipsAreFound(computerGameArea) == 17)
+            {
+                _logger.gamePrint("Congrats, you found all the ships!!!");
+                _logger.gamePrint($"Winner: {firstname} {lastname}");
+                Console.WriteLine("Last Situation \n___________________________________________");
+                printComputerGameArea(computerGameArea);
+                printUserGameArea(computerGameArea);
+                return true;
+            }
+            return false;
+        }
+
+        public bool checkComputerWin(int[,] userGameArea)
+        {
+            if (checkAllShipsAreFound(userGameArea) == 17)
+            {
+                _logger.gamePrint("Nice try, Computer found all the ships!!!");
+                Console.WriteLine("Last Situation \n___________________________________________");
+                printComputerGameArea(userGameArea);
+                printUserGameArea(userGameArea);
+                return true;
+            }
+            return false;
+        }
+
+        public bool checkComputerHoundredRound(int[,] userGameArea)
+        {
+            if (computerRoundCounter == 100)
+            {
+                _logger.gamePrint("Nice try, Computer found all the ships!!!");
+                Console.WriteLine("Last Situation \n___________________________________________");
+                printComputerGameArea(userGameArea);
+                printUserGameArea(userGameArea);
+                return true;
+            }
+            return false;
+        }
+
+        public bool checkUserHoundredRound(int[,] computerGameArea, string firstname, string lastname)
+        {
+            if (userRoundCounter == 100)
+            {
+                _logger.gamePrint("Congrats, you found all the ships!!!");
+                _logger.gamePrint($"Winner: {firstname} {lastname}");
+                Console.WriteLine("Last Situation \n___________________________________________");
+                printComputerGameArea(computerGameArea);
+                printUserGameArea(computerGameArea);
+                return true;
+            }
+            return false;
         }
     }
 }
