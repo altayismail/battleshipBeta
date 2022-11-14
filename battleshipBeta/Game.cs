@@ -222,7 +222,7 @@ namespace battleshipBeta
                     return (getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2);
                 }
             }
-            if(!(Y + 1 > 10))
+            if(!(Y + 1 > 9))
             {
                 if (userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 2 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 3)
                 {
@@ -230,7 +230,7 @@ namespace battleshipBeta
                     return (getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2);
                 }
             }
-            if(!(X + 1 > 10))
+            if(!(X + 1 > 9))
             {
                 if (userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 2 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 3)
                 {
@@ -272,8 +272,8 @@ namespace battleshipBeta
             }
         }
 
-        //computer shoot mechanism
-        public void computerShoot(int[,] userGameArea, List<Ship> userShips)
+        //computer hard level shoot mechanism
+        public void computerHardLevelShoot(int[,] userGameArea, List<Ship> userShips)
         {
             while(true)
             {
@@ -324,6 +324,7 @@ namespace battleshipBeta
                         shipFoundStartPoint = (X, Y);
                         firstSuccessShotChecker = false;
                     }
+                    _logger.gamePrint("Computer succesfully shooted!!!");
                     continue;
                 }
                 //already shot check
@@ -342,6 +343,121 @@ namespace battleshipBeta
                     computerRoundCounter++;
                     lastShotSuccess = false;
                     direction = null;
+                    break;
+                }
+            }
+        }
+
+        //computer hard level shoot mechanism
+        public void computerMediumLevelShoot(int[,] userGameArea, List<Ship> userShips)
+        {
+            while (true)
+            {
+                int X;
+                int Y;
+
+                checkShipIsFullySinked(userShips, userGameArea);
+
+                if (isShipFound == true && lastShotSuccess == true && direction == null)
+                    (X, Y) = shootInRow(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
+                else if (lastShotSuccess == false && isShipFound == true && direction == null)
+                {
+                    (X, Y) = shipFoundStartPoint;
+                    (X, Y) = shootInRow(X, Y, userGameArea);
+                }
+                else if (isShipFound == false)
+                {
+                    X = _random.Next(10);
+                    Y = _random.Next(10);
+                }
+                //after the first shoot, computer decides which way it should try
+                else if (direction == "North")
+                    (X, Y) = getNorthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                else if (direction == "South")
+                    (X, Y) = getSouthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                else if (direction == "East")
+                    (X, Y) = getEastCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                else if (direction == "West")
+                    (X, Y) = getWestCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                else
+                {
+                    X = _random.Next(10);
+                    Y = _random.Next(10);
+                }
+
+                //succesful shoot check
+                if (userGameArea[X, Y] == 1)
+                {
+                    userGameArea[X, Y] = 2;
+                    computerRoundCounter++;
+                    printUserGameArea(userGameArea);
+                    lastShootedIndex = (X, Y);
+                    lastShotSuccess = true;
+                    isShipFound = true;
+
+                    if (firstSuccessShotChecker == true)
+                    {
+                        shipFoundStartPoint = (X, Y);
+                        firstSuccessShotChecker = false;
+                    }
+                    _logger.gamePrint("Computer succesfully shooted!!!");
+                    continue;
+                }
+                //already shot check
+                else if (userGameArea[X, Y] == 2)
+                {
+                    printUserGameArea(userGameArea);
+                    continue;
+                }
+                //already fail shot check
+                else if (userGameArea[X, Y] == 3)
+                    continue;
+                //cross the fail shot
+                else
+                {
+                    userGameArea[X, Y] = 3;
+                    computerRoundCounter++;
+                    lastShotSuccess = false;
+                    direction = null;
+                    break;
+                }
+            }
+        }
+
+        //computer easy level shoot mechanism
+        public void computerEasyLevelShoot(int[,] userGameArea)
+        {
+            while (true)
+            {
+                int X;
+                int Y;
+
+                X = _random.Next(10);
+                Y = _random.Next(10);
+
+                //succesful shoot check
+                if (userGameArea[X, Y] == 1)
+                {
+                    userGameArea[X, Y] = 2;
+                    computerRoundCounter++;
+                    printUserGameArea(userGameArea);
+                    _logger.gamePrint("Computer succesfully shooted!!!");
+                    continue;
+                }
+                //already shot check
+                else if (userGameArea[X, Y] == 2)
+                {
+                    printUserGameArea(userGameArea);
+                    continue;
+                }
+                //already fail shot check
+                else if (userGameArea[X, Y] == 3)
+                    continue;
+                //cross the fail shot
+                else
+                {
+                    userGameArea[X, Y] = 3;
+                    computerRoundCounter++;
                     break;
                 }
             }
@@ -461,6 +577,7 @@ namespace battleshipBeta
             return (X - 1, Y);
         }
 
+        //Following 4 function checks if the game is end or not
         public bool checkUserWin(int[,] computerGameArea, string firstname, string lastname)
         {
             if (checkAllShipsAreFound(computerGameArea) == 17)

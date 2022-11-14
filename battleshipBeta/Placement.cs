@@ -60,7 +60,14 @@ namespace battleshipBeta
             }
         }
 
-        
+        //Place all the computer ship with a func
+        public void placeAllComputerShip(int[,] computerGameArea, List<Ship> ships)
+        {
+            foreach (var ship in ships)
+            {
+                placementMechanism(computerGameArea, ship);
+            }
+        }
 
         public void placementMechanismForUser(int[,] gameArea, List<Ship> ships)
         {
@@ -125,6 +132,15 @@ namespace battleshipBeta
                 }
             }
             _game.printUserGameArea(gameArea);
+        }
+
+        //Place all the user ship with a function
+        public void placeAllUserShip(int[,] userGameArea, List<Ship> ships)
+        {
+            foreach (var ship in ships)
+            {
+                placementMechanism(userGameArea, ship);
+            }
         }
 
         public string chooseShip(List<Ship> ships)
