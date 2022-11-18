@@ -9,9 +9,6 @@ Placement placement = new Placement(game, logger, random);
 Context context = new Context();
 Score score = new Score(context);
 
-List<Ship> userShips = game.getListOfUserShip(game.userAdmiral, game.userCruiser, game.userDestroyer, game.userDestroyer2, game.userAssault);
-List<Ship> computerShips = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
-
 Console.WriteLine("Welcome To Battle Ship!!!!");
 while (true)
 {
@@ -25,8 +22,9 @@ while (true)
     switch (gameModeChoice)
     {
         case "1":
+            List<Ship> t_computerShips = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
             int[,] computerGameArea = game.createGameArea();
-            placement.placeAllComputerShip(computerGameArea, computerShips);
+            placement.placeAllComputerShip(computerGameArea, t_computerShips);
             Console.WriteLine("Welcome to the Traning Mode...");
             Console.WriteLine("____________________________");
             var (t_firstname, t_lastname) = game.nameAndSurnameInput();
@@ -35,7 +33,7 @@ while (true)
             while (true)
             {
                 game.printComputerGameArea(computerGameArea);
-                game.userShoot(computerGameArea, computerShips);
+                game.userShoot(computerGameArea, t_computerShips);
                 if (game.checkUserWin(computerGameArea, t_firstname, t_lastname))
                     break;
                 if (game.checkUserHoundredRound(computerGameArea, t_firstname, t_lastname))
@@ -61,9 +59,11 @@ while (true)
                 case "1":
                     Console.WriteLine("Welcome to the AI Easy Level...");
                     Console.WriteLine("____________________________");
+                    List<Ship> easy_userShips = game.getListOfUserShip(game.userAdmiral, game.userCruiser, game.userDestroyer, game.userDestroyer2, game.userAssault);
+                    List<Ship> easy_computerShips = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
                     var (easy_firstname, easy_lastname) = game.nameAndSurnameInput();
                     int[,] easy_computerGameArea = game.createGameArea();
-                    placement.placeAllComputerShip(easy_computerGameArea, computerShips);
+                    placement.placeAllComputerShip(easy_computerGameArea, easy_computerShips);
                     int[,] easy_userGameArea = game.createGameArea();
 
                     string easy_placement_type_choice = null;
@@ -82,12 +82,12 @@ while (true)
                     }
 
                     if (easy_placement_type_choice == "y")
-                        placement.placeAllUserShip(easy_userGameArea, userShips);
+                        placement.placeAllUserShip(easy_userGameArea, easy_userShips);
                     else if (easy_placement_type_choice == "n")
                     {
-                        for (int i = 0; i < userShips.Count; i++)
+                        for (int i = 0; i < easy_userShips.Count; i++)
                         {
-                            placement.placementMechanismForUser(easy_userGameArea, userShips);
+                            placement.placementMechanismForUser(easy_userGameArea, easy_userShips);
                         }
                     }
 
@@ -96,7 +96,7 @@ while (true)
                     {
                         game.printComputerGameArea(easy_computerGameArea);
                         game.printUserGameArea(easy_userGameArea);
-                        game.userShoot(easy_computerGameArea, computerShips);
+                        game.userShoot(easy_computerGameArea, easy_computerShips);
                         game.computerEasyLevelShoot(easy_userGameArea);
                         if (game.checkUserWin(easy_computerGameArea, easy_firstname, easy_lastname))
                             break;
@@ -118,9 +118,11 @@ while (true)
                 case "2":
                     Console.WriteLine("Welcome to the AI Medium Level...");
                     Console.WriteLine("____________________________");
+                    List<Ship> mid_userShips = game.getListOfUserShip(game.userAdmiral, game.userCruiser, game.userDestroyer, game.userDestroyer2, game.userAssault);
+                    List<Ship> mid_computerShips = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
                     var (mid_firstname, mid_lastname) = game.nameAndSurnameInput();
                     int[,] mid_computerGameArea = game.createGameArea();
-                    placement.placeAllComputerShip(mid_computerGameArea, computerShips);
+                    placement.placeAllComputerShip(mid_computerGameArea, mid_computerShips);
                     int[,] mid_userGameArea = game.createGameArea();
 
                     string mid_placement_type_choice = null;
@@ -139,12 +141,12 @@ while (true)
                     }
 
                     if (mid_placement_type_choice == "y")
-                        placement.placeAllUserShip(mid_userGameArea, userShips);
+                        placement.placeAllUserShip(mid_userGameArea, mid_userShips);
                     else if (mid_placement_type_choice == "n")
                     {
-                        for (int i = 0; i < userShips.Count; i++)
+                        for (int i = 0; i < mid_userShips.Count; i++)
                         {
-                            placement.placementMechanismForUser(mid_userGameArea, userShips);
+                            placement.placementMechanismForUser(mid_userGameArea, mid_userShips);
                         }
                     }
 
@@ -153,8 +155,8 @@ while (true)
                     {
                         game.printComputerGameArea(mid_computerGameArea);
                         game.printUserGameArea(mid_userGameArea);
-                        game.userShoot(mid_computerGameArea, computerShips);
-                        game.computerHardLevelShoot(mid_userGameArea, userShips);
+                        game.userShoot(mid_computerGameArea, mid_computerShips);
+                        game.computerHardLevelShoot(mid_userGameArea, mid_userShips);
                         if (game.checkUserWin(mid_computerGameArea, mid_firstname, mid_lastname))
                             break;
                         if (game.checkComputerWin(mid_userGameArea))
@@ -177,9 +179,12 @@ while (true)
                 case "3":
                     Console.WriteLine("Welcome to the AI Hard Level...");
                     Console.WriteLine("____________________________");
+
+                    List<Ship> hard_userShips = game.getListOfUserShip(game.userAdmiral, game.userCruiser, game.userDestroyer, game.userDestroyer2, game.userAssault);
+                    List<Ship> hard_computerShips = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
                     var (hard_firstname, hard_lastname) = game.nameAndSurnameInput();
                     int[,] hard_computerGameArea = game.createGameArea();
-                    placement.placeAllComputerShip(hard_computerGameArea, computerShips);
+                    placement.placeAllComputerShip(hard_computerGameArea, hard_computerShips);
                     int[,] hard_userGameArea = game.createGameArea();
 
                     string hard_placement_type_choice = null;
@@ -198,12 +203,12 @@ while (true)
                     }
 
                     if (hard_placement_type_choice == "y")
-                        placement.placeAllUserShip(hard_userGameArea, userShips);
+                        placement.placeAllUserShip(hard_userGameArea, hard_userShips);
                     else if (hard_placement_type_choice == "n")
                     {
-                        for (int i = 0; i < userShips.Count; i++)
+                        for (int i = 0; i < hard_userShips.Count; i++)
                         {
-                            placement.placementMechanismForUser(hard_userGameArea, userShips);
+                            placement.placementMechanismForUser(hard_userGameArea, hard_userShips);
                         }
                     }
 
@@ -212,8 +217,8 @@ while (true)
                     {
                         game.printComputerGameArea(hard_computerGameArea);
                         game.printUserGameArea(hard_userGameArea);
-                        game.userShoot(hard_computerGameArea, computerShips);
-                        game.computerHardLevelShoot(hard_userGameArea, userShips);
+                        game.userShoot(hard_computerGameArea, hard_computerShips);
+                        game.computerHardLevelShoot(hard_userGameArea, hard_userShips);
                         if (game.checkUserWin(hard_computerGameArea, hard_firstname, hard_lastname))
                             break;
                         if (game.checkComputerWin(hard_userGameArea))
