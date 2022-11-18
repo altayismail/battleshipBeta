@@ -10,5 +10,6 @@ namespace battleshipBeta.Entities
         public string? Lastname { get; set; }
         public string? Mode { get; set; }
         public double Duration { get; set; }
+        public bool isUserWinner { get; set; }
     }
 }

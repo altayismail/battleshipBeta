@@ -53,14 +53,18 @@ namespace battleshipBeta
                 .Take(5);
 
             Console.WriteLine("Score List of AI Mode");
-            Console.WriteLine("FIRSTNAME       LASTNAME        MODE            DURATION (min)");
-            Console.WriteLine("______________________________________________________________");
+            Console.WriteLine("FIRSTNAME       LASTNAME        MODE            DURATION (min)       RESULT");
+            Console.WriteLine("____________________________________________________________________________");
             foreach (var score in scores)
             {
                 Console.Write(score.Firstname + "\t\t");
                 Console.Write(score.Lastname + "\t\t");
                 Console.Write(score.Mode + "\t\t");
-                Console.Write(string.Format("{0:0.00}", score.Duration) + "\n");
+                Console.Write(string.Format("{0:0.00}", score.Duration) + "\t\t");
+                if(score.isUserWinner == false) 
+                    Console.Write("     Loser" + "\n");
+                else
+                    Console.Write("     Winner" + "\n");
             }
             Console.WriteLine("______________________________");
         }

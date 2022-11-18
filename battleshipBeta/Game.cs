@@ -117,6 +117,45 @@ namespace battleshipBeta
             return false;
         }
 
+        //computer recognize that it should not shoot one squared index
+        public void recognizeOneSqureRule(int[,] userGameArea, Ship ship)
+        {
+            if(ship.VerorHor == false)
+            {
+                for (int i = ship.LocationIndex - 1; i <= ship.LocationIndex + 1; i++)
+                {
+                    for (int j = ship.StartIndex - 1; j <= ship.EndIndex; j++)
+                    {
+                        if (i > 9 || i < 0 || j < 0 || j > 9)
+                            continue;
+                        if(i == ship.LocationIndex - 1 || i == ship.LocationIndex + 1)
+                            userGameArea[j, i] = 4;
+                        if (i == ship.LocationIndex && j == ship.StartIndex - 1)
+                            userGameArea[j, i] = 4;
+                        else if(i == ship.LocationIndex && j == ship.EndIndex)
+                            userGameArea[j, i] = 4;
+                    }
+                }
+            }
+            else if(ship.VerorHor == true)
+            {
+                for (int i = ship.LocationIndex - 1; i <= ship.LocationIndex + 1; i++)
+                {
+                    for (int j = ship.StartIndex - 1; j <= ship.EndIndex; j++)
+                    {
+                        if (i > 9 || i < 0 || j < 0 || j > 9)
+                            continue;
+                        if (i == ship.LocationIndex - 1 || i == ship.LocationIndex + 1)
+                            userGameArea[i, j] = 4;
+                        if (i == ship.LocationIndex && j == ship.StartIndex - 1)
+                            userGameArea[i, j] = 4;
+                        else if (i == ship.LocationIndex && j == ship.EndIndex)
+                            userGameArea[i, j] = 4;
+                    }
+                }
+            }
+        }
+
         //this function place the ships to game are in horizontal
         public void horizontalPlacement(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
         {
@@ -216,7 +255,7 @@ namespace battleshipBeta
         {
             if(!(Y - 1 < 0))
             {
-                if (userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 2 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 3)
+                if (userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 2 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 3 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 4)
                 {
                     direction = "North";
                     return (getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2);
@@ -224,7 +263,7 @@ namespace battleshipBeta
             }
             if(!(Y + 1 > 9))
             {
-                if (userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 2 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 3)
+                if (userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 2 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 3 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 4)
                 {
                     direction = "South";
                     return (getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2);
@@ -232,7 +271,7 @@ namespace battleshipBeta
             }
             if(!(X + 1 > 9))
             {
-                if (userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 2 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 3)
+                if (userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 2 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 3 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 4 )
                 {
                     direction = "East";
                     return (getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2);
@@ -240,7 +279,7 @@ namespace battleshipBeta
             }
             if(!(X - 1 < 0))
             {
-                if (userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 2 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 3)
+                if (userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 2 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 3 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 4)
                 {
                     direction = "West";
                     return (getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2);
@@ -268,6 +307,8 @@ namespace battleshipBeta
                     direction = null;
                     lastShotSuccess = false;
                     firstSuccessShotChecker = true;
+                    _logger.gamePrint($"{ship.Name} is sinked!!");
+                    recognizeOneSqureRule(gameArea, ship);
                 }
             }
         }
@@ -309,6 +350,12 @@ namespace battleshipBeta
                     Y = _random.Next(10);
                 }
 
+                if(X == null || Y == null)
+                {
+                    X = _random.Next(10);
+                    Y = _random.Next(10);
+                }
+
                 //succesful shoot check
                 if (userGameArea[X, Y] == 1)
                 {
@@ -335,6 +382,8 @@ namespace battleshipBeta
                 }
                 //already fail shot check
                 else if (userGameArea[X, Y] == 3)
+                    continue;
+                else if (userGameArea[X, Y] == 4)
                     continue;
                 //cross the fail shot
                 else
@@ -478,6 +527,8 @@ namespace battleshipBeta
                         Console.Write("0 ");
                     else if (computerGameArea[j, i] == 3)
                         Console.Write("X ");
+                    else if (computerGameArea[j, i] == 4)
+                        Console.Write("- ");
                     else
                         Console.Write("S ");
                 }
@@ -501,6 +552,8 @@ namespace battleshipBeta
                         Console.Write("* ");
                     else if (userGameArea[j, i] == 3)
                         Console.Write("X ");
+                    else if (userGameArea[j, i] == 4)
+                        Console.Write("- ");
                     else
                         Console.Write("S ");
                 }
@@ -548,10 +601,29 @@ namespace battleshipBeta
         //there are couple of time to take this input
         public (string,string) nameAndSurnameInput()
         {
-            _logger.inputer("First Name: ");
-            string firstname = Console.ReadLine();
-            _logger.inputer("Last Name: ");
-            string lastname = Console.ReadLine();
+            string firstname;
+            string lastname;
+            while (true)
+            {
+                _logger.inputer("First Name: ");
+                firstname = Console.ReadLine();
+
+                if (string.IsNullOrEmpty(firstname))
+                {
+                    _logger.printWarning("Firstname cannot be empty!!");
+                    continue;
+                }
+                    
+                _logger.inputer("Last Name: ");
+                lastname = Console.ReadLine();
+
+                if (string.IsNullOrEmpty(lastname))
+                {
+                    _logger.printWarning("Lastname cannot be empty!!");
+                    continue;
+                }
+                break;
+            }
 
             return (firstname, lastname);
         }
@@ -578,7 +650,7 @@ namespace battleshipBeta
         }
 
         //Following 4 function checks if the game is end or not
-        public bool checkUserWin(int[,] computerGameArea, string firstname, string lastname)
+        public bool checkUserWin(int[,] computerGameArea, string firstname, string lastname, bool isUserWinner)
         {
             if (checkAllShipsAreFound(computerGameArea) == 17)
             {
@@ -587,12 +659,13 @@ namespace battleshipBeta
                 Console.WriteLine("Last Situation \n___________________________________________");
                 printComputerGameArea(computerGameArea);
                 printUserGameArea(computerGameArea);
+                isUserWinner = true;
                 return true;
             }
             return false;
         }
 
-        public bool checkComputerWin(int[,] userGameArea)
+        public bool checkComputerWin(int[,] userGameArea, bool isUserWinner)
         {
             if (checkAllShipsAreFound(userGameArea) == 17)
             {
@@ -600,36 +673,39 @@ namespace battleshipBeta
                 Console.WriteLine("Last Situation \n___________________________________________");
                 printComputerGameArea(userGameArea);
                 printUserGameArea(userGameArea);
+                isUserWinner = false;
                 return true;
             }
             return false;
         }
 
-        public bool checkComputerHoundredRound(int[,] userGameArea)
-        {
-            if (computerRoundCounter == 100)
-            {
-                _logger.gamePrint("Nice try, Computer found all the ships!!!");
-                Console.WriteLine("Last Situation \n___________________________________________");
-                printComputerGameArea(userGameArea);
-                printUserGameArea(userGameArea);
-                return true;
-            }
-            return false;
-        }
+        //public bool checkComputerHoundredRound(int[,] userGameArea, bool isUserWinner)
+        //{
+        //    if (computerRoundCounter == 100)
+        //    {
+        //        _logger.gamePrint("Nice try, Computer found all the ships!!!");
+        //        Console.WriteLine("Last Situation \n___________________________________________");
+        //        printComputerGameArea(userGameArea);
+        //        printUserGameArea(userGameArea);
+        //        isUserWinner == false;
+        //        return true;
+        //    }
+        //    return false;
+        //}
 
-        public bool checkUserHoundredRound(int[,] computerGameArea, string firstname, string lastname)
-        {
-            if (userRoundCounter == 100)
-            {
-                _logger.gamePrint("Congrats, you found all the ships!!!");
-                _logger.gamePrint($"Winner: {firstname} {lastname}");
-                Console.WriteLine("Last Situation \n___________________________________________");
-                printComputerGameArea(computerGameArea);
-                printUserGameArea(computerGameArea);
-                return true;
-            }
-            return false;
-        }
+        //public bool checkUserHoundredRound(int[,] computerGameArea, string firstname, string lastname, bool isUserWinner)
+        //{
+        //    if (userRoundCounter == 100)
+        //    {
+        //        _logger.gamePrint("Congrats, you found all the ships!!!");
+        //        _logger.gamePrint($"Winner: {firstname} {lastname}");
+        //        Console.WriteLine("Last Situation \n___________________________________________");
+        //        printComputerGameArea(computerGameArea);
+        //        printUserGameArea(computerGameArea);
+        //        isUserWinner = true;
+        //        return true;
+        //    }
+        //    return false;
+        //}
     }
 }

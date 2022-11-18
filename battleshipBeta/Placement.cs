@@ -93,18 +93,18 @@ namespace battleshipBeta
                     ship.VerorHor = true;
                     _logger.print($"{ship.Name} is vertical.");
 
-                    (ship.StartIndex, ship.LocationIndex) = takeStartCoordinates();
+                    (ship.LocationIndex, ship.StartIndex) = takeStartCoordinates();
                 }
                 else if (verorhor == "2")
                 {
                     ship.VerorHor = false;
                     _logger.print($"{ship.Name} is horizontal.");
 
-                    (ship.LocationIndex, ship.StartIndex) = takeStartCoordinates();
+                    (ship.StartIndex, ship.LocationIndex) = takeStartCoordinates();
                 }
 
                 ship.EndIndex = ship.StartIndex + ship.Length;
-                if (ship.EndIndex >= 10 || ship.EndIndex < 0)
+                if (ship.EndIndex >= 11 || ship.EndIndex <= -1)
                 {
                     Console.WriteLine($"You choose wrong start index for ship, the length of the ship is {ship.Length}. Please try again.");
                     continue;
@@ -120,6 +120,7 @@ namespace battleshipBeta
                         continue;
                     _game.horizontalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
                     ship.isShipPlaced = true;
+                    setShipLocation(ship);
                     break;
                 }
                 else
@@ -128,6 +129,7 @@ namespace battleshipBeta
                         continue;
                     _game.verticalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
                     ship.isShipPlaced = true;
+                    setShipLocation(ship);
                     break;
                 }
             }
@@ -177,12 +179,21 @@ namespace battleshipBeta
                 Console.WriteLine("Do you want to place horizontaly or verticaly\n1. Vertical\n2. Horizontal");
                 Console.Write("Choice: ");
                 verorhor = Console.ReadLine();
-                if (!_game.isItParsable(verorhor))
+                if (_game.isItParsable(verorhor))
+                {
+                    if (int.Parse(verorhor) == 1 || int.Parse(verorhor) == 2)
+                        break;
+                    else
+                    {
+                        Console.WriteLine("Invalid input!!");
+                        continue;
+                    }
+                }
+                else
                 {
                     Console.WriteLine("Invalid input!!");
                     continue;
                 }
-                break;
             }
             return verorhor;
         }

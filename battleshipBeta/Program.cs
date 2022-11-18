@@ -32,12 +32,12 @@ while (true)
             DateTime t_startTime = DateTime.Now;
             while (true)
             {
+                if (game.checkUserWin(computerGameArea, t_firstname, t_lastname, true))
+                    break;
+                //if (game.checkUserHoundredRound(computerGameArea, t_firstname, t_lastname, t_isUserWinner))
+                //    break;
                 game.printComputerGameArea(computerGameArea);
                 game.userShoot(computerGameArea, t_computerShips);
-                if (game.checkUserWin(computerGameArea, t_firstname, t_lastname))
-                    break;
-                if (game.checkUserHoundredRound(computerGameArea, t_firstname, t_lastname))
-                    break;
             }
 
             DateTime t_endTime = DateTime.Now;
@@ -91,28 +91,29 @@ while (true)
                         }
                     }
 
+                    bool easy_isUserWinner = false;
                     DateTime easy_startTime = DateTime.Now;
                     while (true)
                     {
+                        if (game.checkUserWin(easy_computerGameArea, easy_firstname, easy_lastname, easy_isUserWinner))
+                            break;
+                        if (game.checkComputerWin(easy_userGameArea, easy_isUserWinner))
+                            break;
+                        //if (game.checkUserHoundredRound(easy_computerGameArea, easy_firstname, easy_lastname))
+                        //    break;
+                        //if (game.checkComputerHoundredRound(easy_userGameArea))
+                        //    break;
                         game.printComputerGameArea(easy_computerGameArea);
                         game.printUserGameArea(easy_userGameArea);
                         game.userShoot(easy_computerGameArea, easy_computerShips);
                         game.computerEasyLevelShoot(easy_userGameArea);
-                        if (game.checkUserWin(easy_computerGameArea, easy_firstname, easy_lastname))
-                            break;
-                        if (game.checkComputerWin(easy_userGameArea))
-                            break;
-                        if (game.checkUserHoundredRound(easy_computerGameArea, easy_firstname, easy_lastname))
-                            break;
-                        if (game.checkComputerHoundredRound(easy_userGameArea))
-                            break;
                     }
 
                     DateTime easy_endTime = DateTime.Now;
                     double easy_duration = (easy_endTime - easy_startTime).TotalMinutes;
 
                     ExcelObjectAI easy_score = new ExcelObjectAI()
-                    { Firstname = easy_firstname, Lastname = easy_lastname, Duration = easy_duration, Mode = "Easy" };
+                        { Firstname = easy_firstname, Lastname = easy_lastname, Duration = easy_duration, Mode = "Easy", isUserWinner = easy_isUserWinner };
                     score.createScoreforAI(easy_score);
                     break;
                 case "2":
@@ -150,31 +151,31 @@ while (true)
                         }
                     }
 
+                    bool mid_isUserWinner = false;
                     DateTime mid_startTime = DateTime.Now;
                     while (true)
                     {
+                        if (game.checkUserWin(mid_computerGameArea, mid_firstname, mid_lastname, mid_isUserWinner))
+                            break;
+                        if (game.checkComputerWin(mid_userGameArea, mid_isUserWinner))
+                            break;
+                        //if (game.checkUserHoundredRound(mid_computerGameArea, mid_firstname, mid_lastname))
+                        //    break;
+                        //if (game.checkComputerHoundredRound(mid_userGameArea))
+                        //    break;
                         game.printComputerGameArea(mid_computerGameArea);
                         game.printUserGameArea(mid_userGameArea);
                         game.userShoot(mid_computerGameArea, mid_computerShips);
                         game.computerHardLevelShoot(mid_userGameArea, mid_userShips);
-                        if (game.checkUserWin(mid_computerGameArea, mid_firstname, mid_lastname))
-                            break;
-                        if (game.checkComputerWin(mid_userGameArea))
-                            break;
-                        if (game.checkUserHoundredRound(mid_computerGameArea, mid_firstname, mid_lastname))
-                            break;
-                        if (game.checkComputerHoundredRound(mid_userGameArea))
-                            break;
                     }
 
                     DateTime mid_endTime = DateTime.Now;
                     double mid_duration = (mid_endTime - mid_startTime).TotalMinutes;
 
                     ExcelObjectAI mid_score = new ExcelObjectAI()
-                    { Firstname = mid_firstname, Lastname = mid_lastname, Duration = mid_duration, Mode = "Medium" };
+                        { Firstname = mid_firstname, Lastname = mid_lastname, Duration = mid_duration, Mode = "Medium", isUserWinner = mid_isUserWinner };
                     score.createScoreforAI(mid_score);
 
-                    break;
                     break;
                 case "3":
                     Console.WriteLine("Welcome to the AI Hard Level...");
@@ -212,28 +213,29 @@ while (true)
                         }
                     }
 
+                    bool hard_isUserWinner = false;
                     DateTime hard_startTime = DateTime.Now;
                     while (true)
                     {
+                        if (game.checkUserWin(hard_computerGameArea, hard_firstname, hard_lastname, hard_isUserWinner))
+                            break;
+                        if (game.checkComputerWin(hard_userGameArea, hard_isUserWinner))
+                            break;
+                        //if (game.checkUserHoundredRound(hard_computerGameArea, hard_firstname, hard_lastname, isUserWinner))
+                        //    break;
+                        //if (game.checkComputerHoundredRound(hard_userGameArea, isUserWinner))
+                        //    break;
                         game.printComputerGameArea(hard_computerGameArea);
                         game.printUserGameArea(hard_userGameArea);
                         game.userShoot(hard_computerGameArea, hard_computerShips);
                         game.computerHardLevelShoot(hard_userGameArea, hard_userShips);
-                        if (game.checkUserWin(hard_computerGameArea, hard_firstname, hard_lastname))
-                            break;
-                        if (game.checkComputerWin(hard_userGameArea))
-                            break;
-                        if (game.checkUserHoundredRound(hard_computerGameArea, hard_firstname, hard_lastname))
-                            break;
-                        if (game.checkComputerHoundredRound(hard_userGameArea))
-                            break;
                     }
 
                     DateTime hard_endTime = DateTime.Now;
                     double hard_duration = (hard_endTime - hard_startTime).TotalMinutes;
 
                     ExcelObjectAI hard_score = new ExcelObjectAI()
-                    { Firstname = hard_firstname, Lastname = hard_lastname, Duration = hard_duration, Mode = "Hard" };
+                        { Firstname = hard_firstname, Lastname = hard_lastname, Duration = hard_duration, Mode = "Hard", isUserWinner = hard_isUserWinner };
                     score.createScoreforAI(hard_score);
 
                     break;
