@@ -1,6 +1,6 @@
 ﻿namespace battleshipBeta.Entities
 {
-    internal class Ship
+    public class Ship
     {
         public int Id { get; set; }
         public int Length { get; set; }

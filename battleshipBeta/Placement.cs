@@ -2,7 +2,7 @@
 
 namespace battleshipBeta
 {
-    internal class Placement
+    public class Placement
     {
         private readonly Game _game;
         private readonly Logger _logger;
@@ -20,7 +20,6 @@ namespace battleshipBeta
             while (true)
             {
                 var index = _game.randomIndexing(ship.Length);
-                _logger.print($"Random indexing is done for {ship.Name}");
 
                 ship.StartIndex = index.Item2;
                 ship.EndIndex = index.Item3;
@@ -28,15 +27,9 @@ namespace battleshipBeta
 
                 var verorhor = _game.randomIndexing(10);
                 if (verorhor.Item1 < 5)
-                {
-                    _logger.print($"{ship.Name} is placed verticaly.");
                     ship.VerorHor = true;
-                }
                 else
-                {
-                    _logger.print($"{ship.Name} is placed horizontaly.");
                     ship.VerorHor = false;
-                }
 
                 
 
@@ -69,7 +62,7 @@ namespace battleshipBeta
             }
         }
 
-        public void placementMechanismForUser(int[,] gameArea, List<Ship> ships)
+        public void placementMechanismForUser(int[,] gameArea, List<Ship> ships, string username, string lastname)
         {
             while (true)
             {
@@ -91,14 +84,12 @@ namespace battleshipBeta
                 if (verorhor == "1")
                 {
                     ship.VerorHor = true;
-                    _logger.print($"{ship.Name} is vertical.");
 
                     (ship.LocationIndex, ship.StartIndex) = takeStartCoordinates();
                 }
                 else if (verorhor == "2")
                 {
                     ship.VerorHor = false;
-                    _logger.print($"{ship.Name} is horizontal.");
 
                     (ship.StartIndex, ship.LocationIndex) = takeStartCoordinates();
                 }
@@ -110,9 +101,6 @@ namespace battleshipBeta
                     continue;
                 }
                 //Horizontal and Vertical placement choice end
-
-                _logger.print($"Random indexing is done for {ship.Name}");
-
                 //check vertical or horizontal placement
                 if (ship.VerorHor == true)
                 {
@@ -133,7 +121,7 @@ namespace battleshipBeta
                     break;
                 }
             }
-            _game.printUserGameArea(gameArea);
+            _game.printUserGameArea(gameArea, username, lastname);
         }
 
         //Place all the user ship with a function

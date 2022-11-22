@@ -68,7 +68,5 @@ namespace battleshipBeta
             }
             Console.WriteLine("______________________________");
         }
-
-
     }
 }

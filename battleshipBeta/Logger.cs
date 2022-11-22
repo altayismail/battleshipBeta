@@ -1,6 +1,6 @@
 ﻿namespace battleshipBeta
 {
-    internal class Logger
+    public class Logger
     {
         public void print(string message)
         {

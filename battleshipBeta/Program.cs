@@ -15,7 +15,7 @@ while (true)
     menuScript();
     logger.inputer("Choice: ");
     var gameModeChoice = Console.ReadLine();
-    if (gameModeChoice == "5")
+    if (gameModeChoice == "6")
         break;
 
     Console.WriteLine("____________________________");
@@ -32,19 +32,17 @@ while (true)
             DateTime t_startTime = DateTime.Now;
             while (true)
             {
-                if (game.checkUserWin(computerGameArea, t_firstname, t_lastname, true))
-                    break;
-                //if (game.checkUserHoundredRound(computerGameArea, t_firstname, t_lastname, t_isUserWinner))
-                //    break;
                 game.printComputerGameArea(computerGameArea);
                 game.userShoot(computerGameArea, t_computerShips);
+                if (game.checkUserWin(computerGameArea, computerGameArea, t_firstname, t_lastname, true).Item1)
+                    break;
             }
 
             DateTime t_endTime = DateTime.Now;
             double t_duration = (t_endTime - t_startTime).TotalMinutes;
 
             ExcelObjectTuttorial T_score = new ExcelObjectTuttorial()
-                { Firstname = t_firstname, Lastname = t_lastname, Duration = t_duration };
+            { Firstname = t_firstname, Lastname = t_lastname, Duration = t_duration };
             score.createScoreforTuttorial(T_score);
             continue;
 
@@ -54,6 +52,7 @@ while (true)
             var gameLevelChoice = Console.ReadLine();
             if (gameLevelChoice == "4")
                 break;
+            Console.WriteLine("____________________________");
             switch (gameLevelChoice)
             {
                 case "1":
@@ -87,7 +86,7 @@ while (true)
                     {
                         for (int i = 0; i < easy_userShips.Count; i++)
                         {
-                            placement.placementMechanismForUser(easy_userGameArea, easy_userShips);
+                            placement.placementMechanismForUser(easy_userGameArea, easy_userShips, easy_firstname, easy_lastname);
                         }
                     }
 
@@ -95,25 +94,21 @@ while (true)
                     DateTime easy_startTime = DateTime.Now;
                     while (true)
                     {
-                        if (game.checkUserWin(easy_computerGameArea, easy_firstname, easy_lastname, easy_isUserWinner))
-                            break;
-                        if (game.checkComputerWin(easy_userGameArea, easy_isUserWinner))
-                            break;
-                        //if (game.checkUserHoundredRound(easy_computerGameArea, easy_firstname, easy_lastname))
-                        //    break;
-                        //if (game.checkComputerHoundredRound(easy_userGameArea))
-                        //    break;
                         game.printComputerGameArea(easy_computerGameArea);
-                        game.printUserGameArea(easy_userGameArea);
+                        game.printUserGameArea(easy_userGameArea, easy_firstname, easy_lastname);
                         game.userShoot(easy_computerGameArea, easy_computerShips);
-                        game.computerEasyLevelShoot(easy_userGameArea);
+                        if (game.checkUserWin(easy_computerGameArea, easy_userGameArea, easy_firstname, easy_lastname, easy_isUserWinner).Item1)
+                            break;
+                        game.computerEasyLevelShoot(easy_userGameArea, easy_firstname, easy_lastname);
+                        if (game.checkComputerWin(easy_userGameArea, easy_computerGameArea, easy_isUserWinner, easy_firstname, easy_firstname).Item1)
+                            break;
                     }
 
                     DateTime easy_endTime = DateTime.Now;
                     double easy_duration = (easy_endTime - easy_startTime).TotalMinutes;
 
                     ExcelObjectAI easy_score = new ExcelObjectAI()
-                        { Firstname = easy_firstname, Lastname = easy_lastname, Duration = easy_duration, Mode = "Easy", isUserWinner = easy_isUserWinner };
+                    { Firstname = easy_firstname, Lastname = easy_lastname, Duration = easy_duration, Mode = "Easy", isUserWinner = easy_isUserWinner };
                     score.createScoreforAI(easy_score);
                     break;
                 case "2":
@@ -147,7 +142,7 @@ while (true)
                     {
                         for (int i = 0; i < mid_userShips.Count; i++)
                         {
-                            placement.placementMechanismForUser(mid_userGameArea, mid_userShips);
+                            placement.placementMechanismForUser(mid_userGameArea, mid_userShips, mid_firstname, mid_lastname);
                         }
                     }
 
@@ -155,25 +150,21 @@ while (true)
                     DateTime mid_startTime = DateTime.Now;
                     while (true)
                     {
-                        if (game.checkUserWin(mid_computerGameArea, mid_firstname, mid_lastname, mid_isUserWinner))
-                            break;
-                        if (game.checkComputerWin(mid_userGameArea, mid_isUserWinner))
-                            break;
-                        //if (game.checkUserHoundredRound(mid_computerGameArea, mid_firstname, mid_lastname))
-                        //    break;
-                        //if (game.checkComputerHoundredRound(mid_userGameArea))
-                        //    break;
                         game.printComputerGameArea(mid_computerGameArea);
-                        game.printUserGameArea(mid_userGameArea);
+                        game.printUserGameArea(mid_userGameArea, mid_firstname, mid_lastname);
                         game.userShoot(mid_computerGameArea, mid_computerShips);
-                        game.computerHardLevelShoot(mid_userGameArea, mid_userShips);
+                        if (game.checkUserWin(mid_computerGameArea, mid_userGameArea, mid_firstname, mid_lastname, mid_isUserWinner).Item1)
+                            break;
+                        game.computerHardLevelShoot(mid_userGameArea, mid_userShips, mid_firstname, mid_lastname);
+                        if (game.checkComputerWin(mid_userGameArea, mid_computerGameArea, mid_isUserWinner, mid_firstname, mid_lastname).Item1)
+                            break;
                     }
 
                     DateTime mid_endTime = DateTime.Now;
                     double mid_duration = (mid_endTime - mid_startTime).TotalMinutes;
 
                     ExcelObjectAI mid_score = new ExcelObjectAI()
-                        { Firstname = mid_firstname, Lastname = mid_lastname, Duration = mid_duration, Mode = "Medium", isUserWinner = mid_isUserWinner };
+                    { Firstname = mid_firstname, Lastname = mid_lastname, Duration = mid_duration, Mode = "Medium", isUserWinner = mid_isUserWinner };
                     score.createScoreforAI(mid_score);
 
                     break;
@@ -209,7 +200,7 @@ while (true)
                     {
                         for (int i = 0; i < hard_userShips.Count; i++)
                         {
-                            placement.placementMechanismForUser(hard_userGameArea, hard_userShips);
+                            placement.placementMechanismForUser(hard_userGameArea, hard_userShips, hard_firstname, hard_lastname);
                         }
                     }
 
@@ -217,25 +208,21 @@ while (true)
                     DateTime hard_startTime = DateTime.Now;
                     while (true)
                     {
-                        if (game.checkUserWin(hard_computerGameArea, hard_firstname, hard_lastname, hard_isUserWinner))
-                            break;
-                        if (game.checkComputerWin(hard_userGameArea, hard_isUserWinner))
-                            break;
-                        //if (game.checkUserHoundredRound(hard_computerGameArea, hard_firstname, hard_lastname, isUserWinner))
-                        //    break;
-                        //if (game.checkComputerHoundredRound(hard_userGameArea, isUserWinner))
-                        //    break;
                         game.printComputerGameArea(hard_computerGameArea);
-                        game.printUserGameArea(hard_userGameArea);
+                        game.printUserGameArea(hard_userGameArea, hard_firstname, hard_lastname);
                         game.userShoot(hard_computerGameArea, hard_computerShips);
-                        game.computerHardLevelShoot(hard_userGameArea, hard_userShips);
+                        if (game.checkUserWin(hard_computerGameArea, hard_userGameArea, hard_firstname, hard_lastname, hard_isUserWinner).Item1)
+                            break;
+                        game.computerHardLevelShoot(hard_userGameArea, hard_userShips, hard_firstname, hard_lastname);
+                        if (game.checkComputerWin(hard_userGameArea, hard_computerGameArea, hard_isUserWinner, hard_firstname, hard_lastname).Item1)
+                            break;
                     }
 
                     DateTime hard_endTime = DateTime.Now;
                     double hard_duration = (hard_endTime - hard_startTime).TotalMinutes;
 
                     ExcelObjectAI hard_score = new ExcelObjectAI()
-                        { Firstname = hard_firstname, Lastname = hard_lastname, Duration = hard_duration, Mode = "Hard", isUserWinner = hard_isUserWinner };
+                    { Firstname = hard_firstname, Lastname = hard_lastname, Duration = hard_duration, Mode = "Hard", isUserWinner = game.checkUserWin(hard_computerGameArea, hard_userGameArea, hard_firstname, hard_lastname, hard_isUserWinner).Item2 };
                     score.createScoreforAI(hard_score);
 
                     break;
@@ -250,6 +237,32 @@ while (true)
         case "4":
             score.getListOfAIScore();
             continue;
+        case "5":
+            Console.WriteLine("Welcome to the AI Simulator...");
+            Console.WriteLine("____________________________");
+
+            List<Ship> computerShips2 = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
+            List<Ship> computerShips3 = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
+            int[,] computerGameArea3 = game.createGameArea();
+            int[,] computerGameArea2 = game.createGameArea();
+            placement.placeAllComputerShip(computerGameArea3, computerShips3);
+            placement.placeAllComputerShip(computerGameArea2, computerShips2);
+          
+            while (true)
+            {
+                game.printUserGameArea(computerGameArea3, "Computer 1", "");
+                game.printUserGameArea(computerGameArea2, "Computer 2", "");
+                game.computerHardLevelShoot(computerGameArea3, computerShips3, "Computer 1", "");
+                if (game.checkComputerWin(computerGameArea2, computerGameArea3, false, "Computer 2", "").Item1)
+                    break;
+                game.computerHardLevelShoot(computerGameArea2, computerShips2, "Computer 1", "");
+                if (game.checkComputerWin(computerGameArea3, computerGameArea2, false, "Computer 2", "").Item1)
+                    break;
+                Thread.Sleep(500);
+            }
+
+            logger.gamePrint("Round Number: " + game.computerRoundCounter);
+            continue;
         default:
             Console.WriteLine("Please enter valid choice!!!");
             continue;
@@ -261,7 +274,7 @@ void menuScript()
 {
     Console.WriteLine("Please select the game mode");
     Console.WriteLine("____________________________");
-    Console.WriteLine("1. Traning Mode\n2. AI Mode\n3. Past Results of Traning Mode\n4. Past Result of AI Mode\n5. Quit");
+    Console.WriteLine("1. Traning Mode\n2. AI Mode\n3. Past Results of Traning Mode\n4. Past Result of AI Mode\n5. AI Simulator\n6. Quit");
 }
 
 void modeMenuScript()
@@ -270,15 +283,3 @@ void modeMenuScript()
     Console.WriteLine("____________________________");
     Console.WriteLine("1. Easy\n2. Medium\n3. Hard\n4. Quit");
 }
-
-//Console.WriteLine("____________________________");
-//Console.WriteLine("Game Cheat Sheeat");
-
-//for (int i = 0; i < 10; i++)
-//{
-//    for (int j = 0; j < 10; j++)
-//    {
-//        Console.Write(computerGameArea[j, i] + " ");
-//    }
-//    Console.Write("\n");
-//}

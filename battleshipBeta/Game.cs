@@ -2,34 +2,57 @@
 
 namespace battleshipBeta
 {
-    internal class Game
+    public class Game
     {
         //In the game area, 0 means there is no ship, 1 means there is ship but it was not shooted
         //2 means there is a ship and it was shooted, 3 means there is no ship but it was fail shoot
         //verorhor variable means false is vertical placement, true is horizontal placement
 
+        public int[,] shipProbabilty = new int[10, 10]
+        {
+            {4,8,11,13,14,14,13,11,8,4},
+            {8,16,22,26,28,28,26,22,16,8},
+            {11,22,31,37,40,40,37,31,22,11},
+            {13,26,37,45,49,49,45,37,26,13},
+            {14,28,40,49,54,54,49,40,28,14},
+            {14,28,40,49,54,54,49,40,28,14},
+            {13,26,37,45,49,49,45,37,26,13},
+            {11,22,31,37,40,40,37,31,22,11},
+            {8,16,22,26,28,28,26,22,16,8 },
+            {4,8,11,13,14,14,13,11,8,4}
+        };
+
+        List<(int, int)> edgeIndexs = new List<(int, int)>
+        {
+            (0, 0), (2, 0), (4, 0), (6, 0), (8, 0),
+            (0, 2), (0, 4), (0, 6), (0, 8),
+            (9, 2), (9, 4), (9, 6), (9, 8),
+            (2, 9), (4, 9), (6, 9), (8, 9)
+        };
+
         public (int, int) lastShootedIndex;
         public (int, int) shipFoundStartPoint;
 
         public bool isShipFound = false;
-        public bool lastShotSuccess;
+        public bool lastShotSuccess = false;
         public bool firstSuccessShotChecker = true;
         public string direction;
 
         public int computerRoundCounter = 1;
         public int userRoundCounter = 1;
+        public int randomActivater = 0;
 
-        public Ship computerAdmiral = new Ship(5, "Computer Admiral", 1);
-        public Ship computerCruiser = new Ship(4, "Computer Cruiser", 2);
-        public Ship computerDestroyer = new Ship(3, "Computer Destroyer", 3);
-        public Ship comptuerDestroyer2 = new Ship(3, "Computer Destroyer2", 4);
-        public Ship computerAssault = new Ship(2, "Computer Assault", 5);
+        public Ship computerAdmiral = new Ship(5, "Computer Aircraft Carrier", 1);
+        public Ship computerCruiser = new Ship(4, "Computer Battleship", 2);
+        public Ship computerDestroyer = new Ship(3, "Computer Cruiser", 3);
+        public Ship comptuerDestroyer2 = new Ship(3, "Computer Submarine", 4);
+        public Ship computerAssault = new Ship(2, "Computer Destroyer", 5);
 
-        public Ship userAdmiral = new Ship(5, "User Admiral", 1);
-        public Ship userCruiser = new Ship(4, "User Cruiser", 2);
-        public Ship userDestroyer = new Ship(3, "User Destroyer", 3);
-        public Ship userDestroyer2 = new Ship(3, "User Destroyer2", 4);
-        public Ship userAssault = new Ship(2, "User Assault", 5);
+        public Ship userAdmiral = new Ship(5, "User Aircraft Carrier", 1);
+        public Ship userCruiser = new Ship(4, "User Battleship", 2);
+        public Ship userDestroyer = new Ship(3, "User Cruiser", 3);
+        public Ship userDestroyer2 = new Ship(3, "User Submarine", 4);
+        public Ship userAssault = new Ship(2, "User Destroyer", 5);
 
         private readonly Random _random;
         private readonly Logger _logger;
@@ -75,7 +98,6 @@ namespace battleshipBeta
                     gameArea[j, i] = 0;
                 }
             }
-            _logger.print("Game area created...");
             return gameArea;
         }
 
@@ -89,10 +111,7 @@ namespace battleshipBeta
                     if (i > 9 || i < 0 || j < 0 || j > 9)
                         continue;
                     if (gameArea[i, j] == 1)
-                    {
-                        _logger.print("Placement is blocked by ONE SQUARE RULE!!!");
                         return true;
-                    }
                 }
             }
             return false;
@@ -108,10 +127,7 @@ namespace battleshipBeta
                     if (i > 9 || i < 0 || j < 0 || j > 9)
                         continue;
                     if (gameArea[j, i] == 1)
-                    {
-                        _logger.print("Placement is blocked by ONE SQUARE RULE!!!");
                         return true;
-                    }
                 }
             }
             return false;
@@ -129,11 +145,20 @@ namespace battleshipBeta
                         if (i > 9 || i < 0 || j < 0 || j > 9)
                             continue;
                         if(i == ship.LocationIndex - 1 || i == ship.LocationIndex + 1)
+                        {
+                            shipProbabilty[i, j] = 0;
                             userGameArea[j, i] = 4;
+                        }
                         if (i == ship.LocationIndex && j == ship.StartIndex - 1)
+                        {
+                            shipProbabilty[i, j] = 0;
                             userGameArea[j, i] = 4;
+                        }
                         else if(i == ship.LocationIndex && j == ship.EndIndex)
+                        {
+                            shipProbabilty[i, j] = 0;
                             userGameArea[j, i] = 4;
+                        }
                     }
                 }
             }
@@ -146,11 +171,21 @@ namespace battleshipBeta
                         if (i > 9 || i < 0 || j < 0 || j > 9)
                             continue;
                         if (i == ship.LocationIndex - 1 || i == ship.LocationIndex + 1)
+                        {
+                            shipProbabilty[i, j] = 0;
                             userGameArea[i, j] = 4;
+                        }
+                            
                         if (i == ship.LocationIndex && j == ship.StartIndex - 1)
+                        {
+                            shipProbabilty[i, j] = 0;
                             userGameArea[i, j] = 4;
+                        }
                         else if (i == ship.LocationIndex && j == ship.EndIndex)
+                        {
+                            shipProbabilty[i, j] = 0;
                             userGameArea[i, j] = 4;
+                        }  
                     }
                 }
             }
@@ -179,7 +214,7 @@ namespace battleshipBeta
         {
             while (true)
             {
-                checkShipIsFullySinked(computerShips, computerGameArea);
+                checkShipIsFullySinkedforUser(computerShips, computerGameArea);
                 Console.WriteLine("Please enter X coordinate!");
                 _logger.inputer("X: ");
                 var x_axis = Console.ReadLine();
@@ -253,7 +288,7 @@ namespace battleshipBeta
         //this function is focus on when it founds a success shot and try to find other piece of ship
         public (int, int) shootInRow(int X, int Y, int[,] userGameArea)
         {
-            if(!(Y - 1 < 0))
+            if(!(Y - 1 <= 0))
             {
                 if (userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 2 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 3 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 4)
                 {
@@ -261,7 +296,7 @@ namespace battleshipBeta
                     return (getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2);
                 }
             }
-            if(!(Y + 1 > 9))
+            if(!(Y + 1 >= 10))
             {
                 if (userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 2 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 3 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 4)
                 {
@@ -269,7 +304,7 @@ namespace battleshipBeta
                     return (getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2);
                 }
             }
-            if(!(X + 1 > 9))
+            if(!(X + 1 >= 10))
             {
                 if (userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 2 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 3 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 4 )
                 {
@@ -277,7 +312,7 @@ namespace battleshipBeta
                     return (getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2);
                 }
             }
-            if(!(X - 1 < 0))
+            if(!(X - 1 <= 0))
             {
                 if (userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 2 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 3 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 4)
                 {
@@ -288,107 +323,121 @@ namespace battleshipBeta
             return (X, Y);
         }
 
-        //this mechanism checks every round, if there is a sinked ship
-        public void checkShipIsFullySinked(List<Ship> ships, int[,] gameArea)
-        {
-            foreach (var ship in ships.Where(x => x.isShipSinked == false).ToList<Ship>())
-            {
-                int shipSinkCounter = 0;
-                for (int i = 0; i < ship.Length; i++)
-                {
-                    if (gameArea[ship.YLocations[i],ship.XLocations[i]] == 2)
-                        shipSinkCounter++;
-                }
-
-                if (shipSinkCounter == ship.Length)
-                {
-                    isShipFound = false;
-                    ship.isShipSinked = true;
-                    direction = null;
-                    lastShotSuccess = false;
-                    firstSuccessShotChecker = true;
-                    _logger.gamePrint($"{ship.Name} is sinked!!");
-                    recognizeOneSqureRule(gameArea, ship);
-                }
-            }
-        }
-
         //computer hard level shoot mechanism
-        public void computerHardLevelShoot(int[,] userGameArea, List<Ship> userShips)
+        public void computerHardLevelShoot(int[,] userGameArea, List<Ship> userShips, string firstname, string lastname)
         {
             while(true)
             {
-                int X;
-                int Y;
+                int X = 0;
+                int Y = 0;
 
-                checkShipIsFullySinked(userShips, userGameArea);
+                checkShipIsFullySinkedforComputer(userShips, userGameArea);
 
                 if (isShipFound == true && lastShotSuccess == true && direction == null)
+                {
                     (X, Y) = shootInRow(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
-                else if (lastShotSuccess == false && isShipFound == true && direction == null)
+                }
+                else if (isShipFound == true && lastShotSuccess == false && direction == null)
                 {
                     (X, Y) = shipFoundStartPoint;
                     (X, Y) = shootInRow(X, Y, userGameArea);
                 }
                 else if (isShipFound == false)
                 {
-                    X = _random.Next(10);
-                    Y = _random.Next(10);
+                    (X, Y) = randomShootDecider(userGameArea, userShips);
                 }
-                //after the first shoot, computer decides which way it should try
+                //after the second success shot, computer finds the ship's other pieces
                 else if (direction == "North")
-                    (X, Y) = getNorthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                {
+                    if(userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] == 2 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] == 3 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] == 4)
+                    {
+                        (X, Y) = (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 + 1);
+                        direction = "South";
+                    }
+                    else
+                        (X, Y) = getNorthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                }
                 else if (direction == "South")
-                    (X, Y) = getSouthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                {
+                    if (userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] == 2 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] == 3 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] == 4)
+                    {
+                        (X, Y) = (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 - 1);
+                        direction = "North";
+                    }
+                    else
+                        (X, Y) = getSouthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                }
                 else if (direction == "East")
-                    (X, Y) = getEastCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                {
+                    if (userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] == 2 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] == 3 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] == 4)
+                    {
+                        (X, Y) = (shipFoundStartPoint.Item1 - 1, shipFoundStartPoint.Item2);
+                        direction = "West";
+                    }
+                    else
+                        (X, Y) = getEastCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                }
                 else if (direction == "West")
-                    (X, Y) = getWestCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                {
+                    if (userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] == 2 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] == 3 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] == 4)
+                    {
+                        (X, Y) = (shipFoundStartPoint.Item1 + 1, shipFoundStartPoint.Item2);
+                        direction = "East";
+                    }
+                    else
+                        (X, Y) = getWestCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                }
                 else
                 {
-                    X = _random.Next(10);
-                    Y = _random.Next(10);
-                }
-
-                if(X == null || Y == null)
-                {
-                    X = _random.Next(10);
-                    Y = _random.Next(10);
+                    (X, Y) = randomShootDecider(userGameArea, userShips);
                 }
 
                 //succesful shoot check
                 if (userGameArea[X, Y] == 1)
                 {
                     userGameArea[X, Y] = 2;
+                    shipProbabilty[X, Y] = 0;
+                    printUserGameArea(userGameArea, firstname, lastname);
                     computerRoundCounter++;
-                    printUserGameArea(userGameArea);
+                    randomActivater = 0;
                     lastShootedIndex = (X, Y);
+
                     lastShotSuccess = true;
                     isShipFound = true;
+                    
 
                     if(firstSuccessShotChecker == true)
                     {
                         shipFoundStartPoint = (X, Y);
                         firstSuccessShotChecker = false;
                     }
+
                     _logger.gamePrint("Computer succesfully shooted!!!");
                     continue;
                 }
                 //already shot check
                 else if (userGameArea[X, Y] == 2)
                 {
-                    printUserGameArea(userGameArea);
+                    printUserGameArea(userGameArea, firstname, lastname);
+                    _logger.printWarning("You are in loop because of game area is 2!!!");
                     continue;
                 }
                 //already fail shot check
                 else if (userGameArea[X, Y] == 3)
+                {
+                    _logger.printWarning("You are in a loop because of game area is 3");
                     continue;
+                }
                 else if (userGameArea[X, Y] == 4)
+                {
+                    _logger.printWarning("You are in loop where game area is 4!!");
                     continue;
+                }
                 //cross the fail shot
                 else
                 {
                     userGameArea[X , Y] = 3;
+                    shipProbabilty[X, Y] = 0;
                     computerRoundCounter++;
                     lastShotSuccess = false;
                     direction = null;
@@ -398,14 +447,14 @@ namespace battleshipBeta
         }
 
         //computer hard level shoot mechanism
-        public void computerMediumLevelShoot(int[,] userGameArea, List<Ship> userShips)
+        public void computerMediumLevelShoot(int[,] userGameArea, List<Ship> userShips, string firstname, string lastname)
         {
             while (true)
             {
                 int X;
                 int Y;
 
-                checkShipIsFullySinked(userShips, userGameArea);
+                checkShipIsFullySinkedforComputer(userShips, userGameArea);
 
                 if (isShipFound == true && lastShotSuccess == true && direction == null)
                     (X, Y) = shootInRow(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
@@ -439,7 +488,7 @@ namespace battleshipBeta
                 {
                     userGameArea[X, Y] = 2;
                     computerRoundCounter++;
-                    printUserGameArea(userGameArea);
+                    printUserGameArea(userGameArea, firstname, lastname);
                     lastShootedIndex = (X, Y);
                     lastShotSuccess = true;
                     isShipFound = true;
@@ -455,7 +504,7 @@ namespace battleshipBeta
                 //already shot check
                 else if (userGameArea[X, Y] == 2)
                 {
-                    printUserGameArea(userGameArea);
+                    printUserGameArea(userGameArea, firstname, lastname);
                     continue;
                 }
                 //already fail shot check
@@ -474,7 +523,7 @@ namespace battleshipBeta
         }
 
         //computer easy level shoot mechanism
-        public void computerEasyLevelShoot(int[,] userGameArea)
+        public void computerEasyLevelShoot(int[,] userGameArea, string firstname, string lastname)
         {
             while (true)
             {
@@ -489,14 +538,14 @@ namespace battleshipBeta
                 {
                     userGameArea[X, Y] = 2;
                     computerRoundCounter++;
-                    printUserGameArea(userGameArea);
+                    printUserGameArea(userGameArea, firstname, lastname);
                     _logger.gamePrint("Computer succesfully shooted!!!");
                     continue;
                 }
                 //already shot check
                 else if (userGameArea[X, Y] == 2)
                 {
-                    printUserGameArea(userGameArea);
+                    printUserGameArea(userGameArea, firstname, lastname);
                     continue;
                 }
                 //already fail shot check
@@ -512,19 +561,139 @@ namespace battleshipBeta
             }
         }
 
+        //This is a decider when computer randomly shoots
+        public (int, int) randomShootDecider(int[,] userGameArea, List<Ship> userShips)
+        {
+            int X;
+            int Y;
+
+            if (userShips.Where(x => x.isShipSinked == false).ToList().Count == 1)
+                return whenAShipLeft(userGameArea, userShips.Where(x => x.isShipSinked == false).Single());
+            else if (computerRoundCounter > 30 && computerRoundCounter < 40)
+                return tryToFindShipsOnEdges(userGameArea);
+            else if (randomActivater > 5)
+            {
+                X = _random.Next(10);
+                Y = _random.Next(10);
+            }
+            else if (computerRoundCounter > 5)
+            {
+                int maxProbabilty = shipProbabilty.Cast<int>().Max();
+                (X, Y) = CoordinatesOf(shipProbabilty, maxProbabilty);
+                randomActivater++;
+            }
+            else
+            {
+                X = _random.Next(10);
+                Y = _random.Next(10);
+            }
+            return (X, Y);
+        }
+
+        // This is method for computer try to found ships on Edges
+        public (int ,int) tryToFindShipsOnEdges(int[,] userGameArea)
+        {
+            int X;
+            int Y;
+
+            while (true)
+            {
+                int index = _random.Next(edgeIndexs.Count);
+                (X, Y) = edgeIndexs[index];
+
+                if (userGameArea[X, Y] != 2 && userGameArea[X, Y] != 3 && userGameArea[X, Y] != 4)
+                {
+                    edgeIndexs.RemoveAt(index);
+                    return (X, Y);
+                }
+                else if (edgeIndexs.Count == 0)
+                    break;
+                else
+                {
+                    edgeIndexs.RemoveAt(index);
+                    continue;
+                }
+            }
+
+            while (true)
+            {
+                (X, Y) = (_random.Next(9), _random.Next(9));
+                if (userGameArea[X, Y] != 2 && userGameArea[X, Y] != 3 && userGameArea[X, Y] != 4)
+                    return (X, Y);
+                else
+                    continue;
+            }
+        }
+
+        //
+        public (int, int) whenAShipLeft(int[,] userGameArea, Ship userShip)
+        {
+            int X;
+            int Y;
+
+            for (int i = 0; i < 10; i++)
+            {
+                int repeatedArea = 0;
+                for (int j = 0; j < 10; j++)
+                {
+                    if (repeatedArea == userShip.Length)
+                    {
+                        repeatedArea = 0;
+                        return (j, i);
+                    }
+                    else if (userGameArea[j, i] == 0)
+                        repeatedArea++;
+                    else
+                        repeatedArea = 0;
+                }
+            }
+
+            for (int i = 0; i < 10; i++)
+            {
+                int repeatedArea = 0;
+                for (int j = 0; j < 10; j++)
+                {
+                    if (repeatedArea == userShip.Length)
+                    {
+                        repeatedArea = 0;
+                        return (i, j);
+                    }
+                    else if (userGameArea[j, i] == 0)
+                        repeatedArea++;
+                    else
+                        repeatedArea = 0;
+                }
+            }
+
+            while (true)
+            {
+                (X, Y) = (_random.Next(9), _random.Next(9));
+                if (userGameArea[X, Y] != 2 && userGameArea[X, Y] != 3 && userGameArea[X, Y] != 4)
+                    return (X, Y);
+                else
+                    continue;
+            }
+        }
+
         //print computer game area
         public void printComputerGameArea(int[,] computerGameArea)
         {
             Console.WriteLine("____________________________");
             Console.WriteLine("Computer Game Area");
+            Console.WriteLine("  | 1 2 3 4 5 6 7 8 9 10");
+            Console.WriteLine("_________________________");
             for (int i = 0; i < 10; i++)
             {
+                if (i + 1 == 10)
+                    Console.Write((i + 1) + "| ");
+                else
+                    Console.Write((i + 1) + " | ");
                 for (int j = 0; j < 10; j++)
                 {
                     if (computerGameArea[j, i] == 0)
-                        Console.Write("0 ");
+                        Console.Write("O ");
                     else if (computerGameArea[j, i] == 1)
-                        Console.Write("0 ");
+                        Console.Write("O ");
                     else if (computerGameArea[j, i] == 3)
                         Console.Write("X ");
                     else if (computerGameArea[j, i] == 4)
@@ -538,16 +707,22 @@ namespace battleshipBeta
         }
 
         //print user game area
-        public void printUserGameArea(int[,] userGameArea)
+        public void printUserGameArea(int[,] userGameArea, string username, string userlastname)
         {
             Console.WriteLine("*****************************");
-            Console.WriteLine("User Game Area");
+            Console.WriteLine($"{username} {userlastname}'s Game Area");
+            Console.WriteLine("  | 1 2 3 4 5 6 7 8 9 10");
+            Console.WriteLine("_________________________");
             for (int i = 0; i < 10; i++)
             {
+                if(i + 1 == 10)
+                    Console.Write((i + 1) + "| ");
+                else
+                    Console.Write((i + 1) + " | ");
                 for (int j = 0; j < 10; j++)
                 {
                     if (userGameArea[j, i] == 0)
-                        Console.Write("0 ");
+                        Console.Write("O ");
                     else if (userGameArea[j, i] == 1)
                         Console.Write("* ");
                     else if (userGameArea[j, i] == 3)
@@ -559,7 +734,7 @@ namespace battleshipBeta
                 }
                 Console.Write("\n");
             }
-            Console.WriteLine("_________________________");
+            Console.WriteLine("*****************************");
         }
 
         //this function checks if all ships are found and help to end game
@@ -631,81 +806,122 @@ namespace battleshipBeta
         //these functions are return the coordinate index according to the direction
         public (int, int) getNorthCoordinate(int X, int Y)
         {
+            if(Y - 1 <= -1)
+                return (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 + 1);
             return (X, Y - 1);
         }
 
         public (int, int) getSouthCoordinate(int X, int Y)
         {
+            if (Y + 1 >= 10)
+                return (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 - 1);
             return (X, Y + 1);
         }
 
         public (int, int) getEastCoordinate(int X, int Y)
         {
+            if (X + 1 >= 10)
+                return (shipFoundStartPoint.Item1 - 1, shipFoundStartPoint.Item2);
             return (X + 1, Y);
         }
 
         public (int, int) getWestCoordinate(int X, int Y)
         {
+            if (X - 1 <= -1)
+                return (shipFoundStartPoint.Item1 + 1, shipFoundStartPoint.Item2);
             return (X - 1, Y);
         }
 
-        //Following 4 function checks if the game is end or not
-        public bool checkUserWin(int[,] computerGameArea, string firstname, string lastname, bool isUserWinner)
+        //Following 2 function checks if the game is end or not
+        public (bool, bool) checkUserWin(int[,] computerGameArea, int[,] userGameArea, string firstname, string lastname, bool isUserWinner)
         {
             if (checkAllShipsAreFound(computerGameArea) == 17)
             {
-                _logger.gamePrint("Congrats, you found all the ships!!!");
+                _logger.gamePrint($"Congrats, you found all the ships in {userRoundCounter} round!!!");
                 _logger.gamePrint($"Winner: {firstname} {lastname}");
                 Console.WriteLine("Last Situation \n___________________________________________");
                 printComputerGameArea(computerGameArea);
-                printUserGameArea(computerGameArea);
+                printUserGameArea(userGameArea, firstname, lastname);
                 isUserWinner = true;
-                return true;
+                return (true, isUserWinner);
             }
-            return false;
+            return (false, isUserWinner);
         }
 
-        public bool checkComputerWin(int[,] userGameArea, bool isUserWinner)
+        public (bool, bool) checkComputerWin(int[,] userGameArea, int[,] computerGameArea, bool isUserWinner, string firstname, string lastname)
         {
             if (checkAllShipsAreFound(userGameArea) == 17)
             {
-                _logger.gamePrint("Nice try, Computer found all the ships!!!");
+                _logger.gamePrint($"Nice try, Computer found all the ships in {computerRoundCounter} round!!!");
                 Console.WriteLine("Last Situation \n___________________________________________");
-                printComputerGameArea(userGameArea);
-                printUserGameArea(userGameArea);
+                printComputerGameArea(computerGameArea);
+                printUserGameArea(userGameArea, firstname, lastname);
                 isUserWinner = false;
-                return true;
+                return (true, isUserWinner);
             }
-            return false;
+            return (false, isUserWinner);
         }
 
-        //public bool checkComputerHoundredRound(int[,] userGameArea, bool isUserWinner)
-        //{
-        //    if (computerRoundCounter == 100)
-        //    {
-        //        _logger.gamePrint("Nice try, Computer found all the ships!!!");
-        //        Console.WriteLine("Last Situation \n___________________________________________");
-        //        printComputerGameArea(userGameArea);
-        //        printUserGameArea(userGameArea);
-        //        isUserWinner == false;
-        //        return true;
-        //    }
-        //    return false;
-        //}
+        //Returns cordinate of a value in 2D array
+        public (int, int) CoordinatesOf(int[,] matrix, int value)
+        {
+            int w = matrix.GetLength(0); // width
+            int h = matrix.GetLength(1); // height
 
-        //public bool checkUserHoundredRound(int[,] computerGameArea, string firstname, string lastname, bool isUserWinner)
-        //{
-        //    if (userRoundCounter == 100)
-        //    {
-        //        _logger.gamePrint("Congrats, you found all the ships!!!");
-        //        _logger.gamePrint($"Winner: {firstname} {lastname}");
-        //        Console.WriteLine("Last Situation \n___________________________________________");
-        //        printComputerGameArea(computerGameArea);
-        //        printUserGameArea(computerGameArea);
-        //        isUserWinner = true;
-        //        return true;
-        //    }
-        //    return false;
-        //}
+            for (int x = 0; x < w; ++x)
+            {
+                for (int y = 0; y < h; ++y)
+                {
+                    if (matrix[x, y].Equals(value))
+                        return (x, y);
+                }
+            }
+            return (-1, -1);
+        }
+
+        //this mechanism checks every round, if there is a sinked ship
+        public void checkShipIsFullySinkedforComputer(List<Ship> ships, int[,] gameArea)
+        {
+            foreach (var ship in ships.Where(x => x.isShipSinked == false).ToList<Ship>())
+            {
+                int shipSinkCounter = 0;
+                for (int i = 0; i < ship.Length; i++)
+                {
+                    if (gameArea[ship.YLocations[i], ship.XLocations[i]] == 2)
+                        shipSinkCounter++;
+                }
+
+                if (shipSinkCounter == ship.Length)
+                {
+                    isShipFound = false;
+                    ship.isShipSinked = true;
+                    direction = null;
+                    lastShotSuccess = false;
+                    firstSuccessShotChecker = true;
+                    _logger.gamePrint($"{ship.Name} is sinked!!");
+                    recognizeOneSqureRule(gameArea, ship);
+                }
+            }
+        }
+
+        public void checkShipIsFullySinkedforUser(List<Ship> ships, int[,] gameArea)
+        {
+            foreach (var ship in ships.Where(x => x.isShipSinked == false).ToList<Ship>())
+            {
+                int shipSinkCounter = 0;
+                for (int i = 0; i < ship.Length; i++)
+                {
+                    if (gameArea[ship.YLocations[i], ship.XLocations[i]] == 2)
+                        shipSinkCounter++;
+                }
+
+                if (shipSinkCounter == ship.Length)
+                {
+                    ship.isShipSinked = true;
+                    _logger.gamePrint($"{ship.Name} is sinked!!");
+                    recognizeOneSqureRule(gameArea, ship);
+                }
+            }
+        }
     }
 }
