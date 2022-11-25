@@ -179,6 +179,17 @@ while (true)
                     placement.placeAllComputerShip(hard_computerGameArea, hard_computerShips);
                     int[,] hard_userGameArea = game.createGameArea();
 
+                    Console.WriteLine("_________________________");
+                    for (int i = 0; i < 10; i++)
+                    {
+                        for (int j = 0; j < 10; j++)
+                        {
+                            Console.Write(game.getPerfectProbability(hard_userShips, hard_userGameArea)[i,j] + " ");
+                        }
+                        Console.Write("\n");
+                    }
+                    Console.WriteLine("*****************************");
+
                     string hard_placement_type_choice = null;
                     while (true)
                     {

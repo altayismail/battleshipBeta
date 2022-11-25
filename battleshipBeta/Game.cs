@@ -8,6 +8,50 @@ namespace battleshipBeta
         //2 means there is a ship and it was shooted, 3 means there is no ship but it was fail shoot
         //verorhor variable means false is vertical placement, true is horizontal placement
 
+        public int[,] getPerfectProbability(List<Ship> ships, int[,] userGameArea)
+        {
+            int[,] shipProbabilty2 = new int[10, 10];
+            foreach (var ship in ships)
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    for (int j = 0; j < 10; j++)
+                    {
+                        for (int k = 0; k < ship.Length; k++)
+                        {
+                            if (j + k >= 10)
+                                break;
+                            if (userGameArea[i, j] == 2 || userGameArea[i, j] == 3 || userGameArea[i, j] == 4)
+                            {
+                                shipProbabilty[i, j] = 0;
+                                break;
+                            }
+                            shipProbabilty2[i, j + k] += 1;
+                        }
+                    }
+                }
+
+                for (int i = 0; i < 10; i++)
+                {
+                    for (int j = 0; j < 10; j++)
+                    {
+                        for (int k = 0; k < ship.Length; k++)
+                        {
+                            if (j + k >= 10)
+                                break;
+                            if (userGameArea[j, i] == 2 || userGameArea[j, i] == 3 || userGameArea[j, i] == 4)
+                            {
+                                shipProbabilty[j, i] = 0;
+                                break;
+                            }
+                            shipProbabilty2[j + k, i] += 1;
+                        }
+                    }
+                }
+            }
+            return shipProbabilty2;
+        }
+
         public int[,] shipProbabilty = new int[10, 10]
         {
             {4,8,11,13,14,14,13,11,8,4},
@@ -569,7 +613,7 @@ namespace battleshipBeta
 
             if (userShips.Where(x => x.isShipSinked == false).ToList().Count == 1)
                 return whenAShipLeft(userGameArea, userShips.Where(x => x.isShipSinked == false).Single());
-            else if (computerRoundCounter > 30 && computerRoundCounter < 40)
+            else if (computerRoundCounter > 20 && computerRoundCounter < 30)
                 return tryToFindShipsOnEdges(userGameArea);
             else if (randomActivater > 5)
             {
