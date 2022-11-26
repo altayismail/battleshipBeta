@@ -4,14 +4,14 @@ namespace battleshipBeta
 {
     public class Game
     {
-        //In the game area, 0 means there is no ship, 1 means there is ship but it was not shooted
+        //In the game area, 0 means there is no ship, no shoot, 1 means there is ship but it was not shooted
         //2 means there is a ship and it was shooted, 3 means there is no ship but it was fail shoot
         //verorhor variable means false is vertical placement, true is horizontal placement
 
         public int[,] getPerfectProbability(List<Ship> ships, int[,] userGameArea)
         {
-            int[,] shipProbabilty2 = new int[10, 10];
-            foreach (var ship in ships)
+            int[,] perfectProbability = new int[10, 10];
+            foreach (var ship in ships.Where(x => x.isShipSinked == false))
             {
                 for (int i = 0; i < 10; i++)
                 {
@@ -19,14 +19,19 @@ namespace battleshipBeta
                     {
                         for (int k = 0; k < ship.Length; k++)
                         {
-                            if (j + k >= 10)
+                            if (j + (ship.Length - 2) >= 9)
                                 break;
                             if (userGameArea[i, j] == 2 || userGameArea[i, j] == 3 || userGameArea[i, j] == 4)
                             {
-                                shipProbabilty[i, j] = 0;
+                                perfectProbability[i, j] = 0;
+                                int temp = k;
+                                for (k = 0; k < temp; k++)
+                                {
+                                    perfectProbability[i, j + k] -= 1;
+                                }
                                 break;
                             }
-                            shipProbabilty2[i, j + k] += 1;
+                            perfectProbability[i, j + k] += 1;
                         }
                     }
                 }
@@ -37,34 +42,25 @@ namespace battleshipBeta
                     {
                         for (int k = 0; k < ship.Length; k++)
                         {
-                            if (j + k >= 10)
+                            if (j + (ship.Length - 2) >= 9)
                                 break;
-                            if (userGameArea[j, i] == 2 || userGameArea[j, i] == 3 || userGameArea[j, i] == 4)
+                            if (userGameArea[j, i] == 2 ||  userGameArea[j, i] == 3 || userGameArea[j, i] == 4)
                             {
-                                shipProbabilty[j, i] = 0;
+                                perfectProbability[j, i] = 0;
+                                int temp = k;
+                                for (k = 0; k < temp; k++)
+                                {
+                                    perfectProbability[j + k, i] -= 1;
+                                }
                                 break;
                             }
-                            shipProbabilty2[j + k, i] += 1;
+                            perfectProbability[j + k, i] += 1;
                         }
                     }
                 }
             }
-            return shipProbabilty2;
+            return perfectProbability;
         }
-
-        public int[,] shipProbabilty = new int[10, 10]
-        {
-            {4,8,11,13,14,14,13,11,8,4},
-            {8,16,22,26,28,28,26,22,16,8},
-            {11,22,31,37,40,40,37,31,22,11},
-            {13,26,37,45,49,49,45,37,26,13},
-            {14,28,40,49,54,54,49,40,28,14},
-            {14,28,40,49,54,54,49,40,28,14},
-            {13,26,37,45,49,49,45,37,26,13},
-            {11,22,31,37,40,40,37,31,22,11},
-            {8,16,22,26,28,28,26,22,16,8 },
-            {4,8,11,13,14,14,13,11,8,4}
-        };
 
         List<(int, int)> edgeIndexs = new List<(int, int)>
         {
@@ -190,17 +186,14 @@ namespace battleshipBeta
                             continue;
                         if(i == ship.LocationIndex - 1 || i == ship.LocationIndex + 1)
                         {
-                            shipProbabilty[i, j] = 0;
                             userGameArea[j, i] = 4;
                         }
                         if (i == ship.LocationIndex && j == ship.StartIndex - 1)
                         {
-                            shipProbabilty[i, j] = 0;
                             userGameArea[j, i] = 4;
                         }
                         else if(i == ship.LocationIndex && j == ship.EndIndex)
                         {
-                            shipProbabilty[i, j] = 0;
                             userGameArea[j, i] = 4;
                         }
                     }
@@ -216,18 +209,15 @@ namespace battleshipBeta
                             continue;
                         if (i == ship.LocationIndex - 1 || i == ship.LocationIndex + 1)
                         {
-                            shipProbabilty[i, j] = 0;
                             userGameArea[i, j] = 4;
                         }
                             
                         if (i == ship.LocationIndex && j == ship.StartIndex - 1)
                         {
-                            shipProbabilty[i, j] = 0;
                             userGameArea[i, j] = 4;
                         }
                         else if (i == ship.LocationIndex && j == ship.EndIndex)
                         {
-                            shipProbabilty[i, j] = 0;
                             userGameArea[i, j] = 4;
                         }  
                     }
@@ -305,7 +295,6 @@ namespace battleshipBeta
                 if (computerGameArea[X - 1, Y - 1] == 1)
                 {
                     computerGameArea[X - 1, Y - 1] = 2;
-                    userRoundCounter++;
                     _logger.gamePrint("You succesfully shoot!!");
                     printComputerGameArea(computerGameArea);
                     continue;
@@ -334,34 +323,34 @@ namespace battleshipBeta
         {
             if(!(Y - 1 <= 0))
             {
-                if (userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 2 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 3 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 4)
+                if (userGameArea[getNorthCoordinate(X, Y, userGameArea).Item1, getNorthCoordinate(X, Y, userGameArea).Item2] != 2 && userGameArea[getNorthCoordinate(X, Y, userGameArea).Item1, getNorthCoordinate(X, Y, userGameArea).Item2] != 3 && userGameArea[getNorthCoordinate(X, Y, userGameArea).Item1, getNorthCoordinate(X, Y, userGameArea).Item2] != 4)
                 {
                     direction = "North";
-                    return (getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2);
+                    return (getNorthCoordinate(X, Y, userGameArea).Item1, getNorthCoordinate(X, Y, userGameArea).Item2);
                 }
             }
             if(!(Y + 1 >= 10))
             {
-                if (userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 2 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 3 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 4)
+                if (userGameArea[getSouthCoordinate(X, Y, userGameArea).Item1, getSouthCoordinate(X, Y, userGameArea).Item2] != 2 && userGameArea[getSouthCoordinate(X, Y, userGameArea).Item1, getSouthCoordinate(X, Y, userGameArea).Item2] != 3 && userGameArea[getSouthCoordinate(X, Y, userGameArea).Item1, getSouthCoordinate(X, Y, userGameArea).Item2] != 4)
                 {
                     direction = "South";
-                    return (getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2);
+                    return (getSouthCoordinate(X, Y, userGameArea).Item1, getSouthCoordinate(X, Y, userGameArea).Item2);
                 }
             }
             if(!(X + 1 >= 10))
             {
-                if (userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 2 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 3 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 4 )
+                if (userGameArea[getEastCoordinate(X, Y, userGameArea).Item1, getEastCoordinate(X, Y, userGameArea).Item2] != 2 && userGameArea[getEastCoordinate(X, Y, userGameArea).Item1, getEastCoordinate(X, Y, userGameArea).Item2] != 3 && userGameArea[getEastCoordinate(X, Y, userGameArea).Item1, getEastCoordinate(X, Y, userGameArea).Item2] != 4 )
                 {
                     direction = "East";
-                    return (getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2);
+                    return (getEastCoordinate(X, Y, userGameArea).Item1, getEastCoordinate(X, Y, userGameArea).Item2);
                 }
             }
             if(!(X - 1 <= 0))
             {
-                if (userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 2 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 3 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 4)
+                if (userGameArea[getWestCoordinate(X, Y, userGameArea).Item1, getWestCoordinate(X, Y, userGameArea).Item2] != 2 && userGameArea[getWestCoordinate(X, Y, userGameArea).Item1, getWestCoordinate(X, Y, userGameArea).Item2] != 3 && userGameArea[getWestCoordinate(X, Y, userGameArea).Item1, getWestCoordinate(X, Y, userGameArea).Item2] != 4)
                 {
                     direction = "West";
-                    return (getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2);
+                    return (getWestCoordinate(X, Y, userGameArea).Item1, getWestCoordinate(X, Y, userGameArea).Item2);
                 }
             }
             return (X, Y);
@@ -372,8 +361,8 @@ namespace battleshipBeta
         {
             while(true)
             {
-                int X = 0;
-                int Y = 0;
+                int X;
+                int Y;
 
                 checkShipIsFullySinkedforComputer(userShips, userGameArea);
 
@@ -393,43 +382,19 @@ namespace battleshipBeta
                 //after the second success shot, computer finds the ship's other pieces
                 else if (direction == "North")
                 {
-                    if(userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] == 2 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] == 3 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] == 4)
-                    {
-                        (X, Y) = (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 + 1);
-                        direction = "South";
-                    }
-                    else
-                        (X, Y) = getNorthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                    (X, Y) = getNorthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
                 }
                 else if (direction == "South")
                 {
-                    if (userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] == 2 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] == 3 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] == 4)
-                    {
-                        (X, Y) = (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 - 1);
-                        direction = "North";
-                    }
-                    else
-                        (X, Y) = getSouthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                    (X, Y) = getSouthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
                 }
                 else if (direction == "East")
                 {
-                    if (userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] == 2 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] == 3 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] == 4)
-                    {
-                        (X, Y) = (shipFoundStartPoint.Item1 - 1, shipFoundStartPoint.Item2);
-                        direction = "West";
-                    }
-                    else
-                        (X, Y) = getEastCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                    (X, Y) = getEastCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
                 }
                 else if (direction == "West")
                 {
-                    if (userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] == 2 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] == 3 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] == 4)
-                    {
-                        (X, Y) = (shipFoundStartPoint.Item1 + 1, shipFoundStartPoint.Item2);
-                        direction = "East";
-                    }
-                    else
-                        (X, Y) = getWestCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                    (X, Y) = getWestCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
                 }
                 else
                 {
@@ -440,9 +405,7 @@ namespace battleshipBeta
                 if (userGameArea[X, Y] == 1)
                 {
                     userGameArea[X, Y] = 2;
-                    shipProbabilty[X, Y] = 0;
                     printUserGameArea(userGameArea, firstname, lastname);
-                    computerRoundCounter++;
                     randomActivater = 0;
                     lastShootedIndex = (X, Y);
 
@@ -481,13 +444,53 @@ namespace battleshipBeta
                 else
                 {
                     userGameArea[X , Y] = 3;
-                    shipProbabilty[X, Y] = 0;
                     computerRoundCounter++;
                     lastShotSuccess = false;
                     direction = null;
                     break;
                 }
             }
+        }
+
+        //these functions are return the coordinate index according to the direction
+        public (int, int) getNorthCoordinate(int X, int Y, int[,] userGameArea)
+        {
+            if(Y - 1 < 0 && userGameArea[X,Y] == 3 && userGameArea[X, Y] == 4)
+            {
+                direction = "South";
+                return (shipFoundStartPoint.Item1 + 1, shipFoundStartPoint.Item2);
+            }  
+            return (X, Y - 1);
+        }
+
+        public (int, int) getSouthCoordinate(int X, int Y, int[,] userGameArea)
+        {
+            if (Y + 1 > 9 && userGameArea[X, Y] == 3 && userGameArea[X, Y] == 4)
+            {
+                direction = "North";
+                return (shipFoundStartPoint.Item1 -1, shipFoundStartPoint.Item2);
+            }
+            return (X, Y + 1);
+        }
+
+        public (int, int) getEastCoordinate(int X, int Y, int[,] userGameArea)
+        {
+            if (X + 1 > 9 && userGameArea[X, Y] == 3 && userGameArea[X, Y] == 4)
+            {
+                direction = "West";
+                return (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 - 1);
+            }
+            return (X + 1, Y);
+        }
+
+        public (int, int) getWestCoordinate(int X, int Y, int[,] userGameArea)
+        {
+            if (X - 1 < 0 && userGameArea[X, Y] == 3 && userGameArea[X, Y] == 4)
+            {
+                direction = "East";
+                return (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 + 1);
+            }
+            return (X - 1, Y);
         }
 
         //computer hard level shoot mechanism
@@ -514,13 +517,13 @@ namespace battleshipBeta
                 }
                 //after the first shoot, computer decides which way it should try
                 else if (direction == "North")
-                    (X, Y) = getNorthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                    (X, Y) = getNorthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
                 else if (direction == "South")
-                    (X, Y) = getSouthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                    (X, Y) = getSouthCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
                 else if (direction == "East")
-                    (X, Y) = getEastCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                    (X, Y) = getEastCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
                 else if (direction == "West")
-                    (X, Y) = getWestCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2);
+                    (X, Y) = getWestCoordinate(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
                 else
                 {
                     X = _random.Next(10);
@@ -531,7 +534,6 @@ namespace battleshipBeta
                 if (userGameArea[X, Y] == 1)
                 {
                     userGameArea[X, Y] = 2;
-                    computerRoundCounter++;
                     printUserGameArea(userGameArea, firstname, lastname);
                     lastShootedIndex = (X, Y);
                     lastShotSuccess = true;
@@ -581,7 +583,6 @@ namespace battleshipBeta
                 if (userGameArea[X, Y] == 1)
                 {
                     userGameArea[X, Y] = 2;
-                    computerRoundCounter++;
                     printUserGameArea(userGameArea, firstname, lastname);
                     _logger.gamePrint("Computer succesfully shooted!!!");
                     continue;
@@ -611,20 +612,10 @@ namespace battleshipBeta
             int X;
             int Y;
 
-            if (userShips.Where(x => x.isShipSinked == false).ToList().Count == 1)
-                return whenAShipLeft(userGameArea, userShips.Where(x => x.isShipSinked == false).Single());
-            else if (computerRoundCounter > 20 && computerRoundCounter < 30)
-                return tryToFindShipsOnEdges(userGameArea);
-            else if (randomActivater > 5)
+            if (computerRoundCounter > 4)
             {
-                X = _random.Next(10);
-                Y = _random.Next(10);
-            }
-            else if (computerRoundCounter > 5)
-            {
-                int maxProbabilty = shipProbabilty.Cast<int>().Max();
-                (X, Y) = CoordinatesOf(shipProbabilty, maxProbabilty);
-                randomActivater++;
+                int maxProbabilty = getPerfectProbability(userShips, userGameArea).Cast<int>().Max();
+                (X, Y) = CoordinatesOf(getPerfectProbability(userShips, userGameArea), maxProbabilty);
             }
             else
             {
@@ -661,7 +652,7 @@ namespace battleshipBeta
 
             while (true)
             {
-                (X, Y) = (_random.Next(9), _random.Next(9));
+                (X, Y) = (_random.Next(10), _random.Next(10));
                 if (userGameArea[X, Y] != 2 && userGameArea[X, Y] != 3 && userGameArea[X, Y] != 4)
                     return (X, Y);
                 else
@@ -669,7 +660,7 @@ namespace battleshipBeta
             }
         }
 
-        //
+        //When there is a ship that has not sinked yet, AI does not shoot where the last ship cannot be
         public (int, int) whenAShipLeft(int[,] userGameArea, Ship userShip)
         {
             int X;
@@ -681,10 +672,7 @@ namespace battleshipBeta
                 for (int j = 0; j < 10; j++)
                 {
                     if (repeatedArea == userShip.Length)
-                    {
-                        repeatedArea = 0;
                         return (j, i);
-                    }
                     else if (userGameArea[j, i] == 0)
                         repeatedArea++;
                     else
@@ -698,10 +686,7 @@ namespace battleshipBeta
                 for (int j = 0; j < 10; j++)
                 {
                     if (repeatedArea == userShip.Length)
-                    {
-                        repeatedArea = 0;
                         return (i, j);
-                    }
                     else if (userGameArea[j, i] == 0)
                         repeatedArea++;
                     else
@@ -711,7 +696,7 @@ namespace battleshipBeta
 
             while (true)
             {
-                (X, Y) = (_random.Next(9), _random.Next(9));
+                (X, Y) = (_random.Next(10), _random.Next(10));
                 if (userGameArea[X, Y] != 2 && userGameArea[X, Y] != 3 && userGameArea[X, Y] != 4)
                     return (X, Y);
                 else
@@ -792,6 +777,13 @@ namespace battleshipBeta
             return oneDimension.Count(x => x.Equals(2));
         }
 
+        public bool checkAllShipsAreFound(List<Ship> ships)
+        {
+            if(ships.All(x => x.isShipSinked == true))
+                return true;
+            return false;
+        }
+
         //this is a helper function for srandom ship placement
         public (int,int,int) randomIndexing(int shipLength)
         {
@@ -845,35 +837,6 @@ namespace battleshipBeta
             }
 
             return (firstname, lastname);
-        }
-
-        //these functions are return the coordinate index according to the direction
-        public (int, int) getNorthCoordinate(int X, int Y)
-        {
-            if(Y - 1 <= -1)
-                return (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 + 1);
-            return (X, Y - 1);
-        }
-
-        public (int, int) getSouthCoordinate(int X, int Y)
-        {
-            if (Y + 1 >= 10)
-                return (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 - 1);
-            return (X, Y + 1);
-        }
-
-        public (int, int) getEastCoordinate(int X, int Y)
-        {
-            if (X + 1 >= 10)
-                return (shipFoundStartPoint.Item1 - 1, shipFoundStartPoint.Item2);
-            return (X + 1, Y);
-        }
-
-        public (int, int) getWestCoordinate(int X, int Y)
-        {
-            if (X - 1 <= -1)
-                return (shipFoundStartPoint.Item1 + 1, shipFoundStartPoint.Item2);
-            return (X - 1, Y);
         }
 
         //Following 2 function checks if the game is end or not

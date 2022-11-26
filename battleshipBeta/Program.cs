@@ -15,7 +15,7 @@ while (true)
     menuScript();
     logger.inputer("Choice: ");
     var gameModeChoice = Console.ReadLine();
-    if (gameModeChoice == "6")
+    if (gameModeChoice == "5")
         break;
 
     Console.WriteLine("____________________________");
@@ -108,7 +108,7 @@ while (true)
                     double easy_duration = (easy_endTime - easy_startTime).TotalMinutes;
 
                     ExcelObjectAI easy_score = new ExcelObjectAI()
-                    { Firstname = easy_firstname, Lastname = easy_lastname, Duration = easy_duration, Mode = "Easy", isUserWinner = easy_isUserWinner };
+                    { Firstname = easy_firstname, Lastname = easy_lastname, Duration = easy_duration, Mode = Modes.Mode.Easy.ToString(), isUserWinner = easy_isUserWinner };
                     score.createScoreforAI(easy_score);
                     break;
                 case "2":
@@ -164,7 +164,7 @@ while (true)
                     double mid_duration = (mid_endTime - mid_startTime).TotalMinutes;
 
                     ExcelObjectAI mid_score = new ExcelObjectAI()
-                    { Firstname = mid_firstname, Lastname = mid_lastname, Duration = mid_duration, Mode = "Medium", isUserWinner = mid_isUserWinner };
+                    { Firstname = mid_firstname, Lastname = mid_lastname, Duration = mid_duration, Mode = Modes.Mode.Medium.ToString(), isUserWinner = mid_isUserWinner };
                     score.createScoreforAI(mid_score);
 
                     break;
@@ -178,17 +178,6 @@ while (true)
                     int[,] hard_computerGameArea = game.createGameArea();
                     placement.placeAllComputerShip(hard_computerGameArea, hard_computerShips);
                     int[,] hard_userGameArea = game.createGameArea();
-
-                    Console.WriteLine("_________________________");
-                    for (int i = 0; i < 10; i++)
-                    {
-                        for (int j = 0; j < 10; j++)
-                        {
-                            Console.Write(game.getPerfectProbability(hard_userShips, hard_userGameArea)[i,j] + " ");
-                        }
-                        Console.Write("\n");
-                    }
-                    Console.WriteLine("*****************************");
 
                     string hard_placement_type_choice = null;
                     while (true)
@@ -227,13 +216,23 @@ while (true)
                         game.computerHardLevelShoot(hard_userGameArea, hard_userShips, hard_firstname, hard_lastname);
                         if (game.checkComputerWin(hard_userGameArea, hard_computerGameArea, hard_isUserWinner, hard_firstname, hard_lastname).Item1)
                             break;
+                        Console.WriteLine("_________________________");
+                        for (int i = 0; i < 10; i++)
+                        {
+                            for (int j = 0; j < 10; j++)
+                            {
+                                Console.Write(game.getPerfectProbability(hard_userShips, hard_userGameArea)[j, i] + " ");
+                            }
+                            Console.Write("\n");
+                        }
+                        Console.WriteLine("*****************************");
                     }
 
                     DateTime hard_endTime = DateTime.Now;
                     double hard_duration = (hard_endTime - hard_startTime).TotalMinutes;
 
                     ExcelObjectAI hard_score = new ExcelObjectAI()
-                    { Firstname = hard_firstname, Lastname = hard_lastname, Duration = hard_duration, Mode = "Hard", isUserWinner = game.checkUserWin(hard_computerGameArea, hard_userGameArea, hard_firstname, hard_lastname, hard_isUserWinner).Item2 };
+                    { Firstname = hard_firstname, Lastname = hard_lastname, Duration = hard_duration, Mode = Modes.Mode.Hard.ToString(), isUserWinner = game.checkUserWin(hard_computerGameArea, hard_userGameArea, hard_firstname, hard_lastname, hard_isUserWinner).Item2 };
                     score.createScoreforAI(hard_score);
 
                     break;
@@ -248,32 +247,6 @@ while (true)
         case "4":
             score.getListOfAIScore();
             continue;
-        case "5":
-            Console.WriteLine("Welcome to the AI Simulator...");
-            Console.WriteLine("____________________________");
-
-            List<Ship> computerShips2 = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
-            List<Ship> computerShips3 = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
-            int[,] computerGameArea3 = game.createGameArea();
-            int[,] computerGameArea2 = game.createGameArea();
-            placement.placeAllComputerShip(computerGameArea3, computerShips3);
-            placement.placeAllComputerShip(computerGameArea2, computerShips2);
-          
-            while (true)
-            {
-                game.printUserGameArea(computerGameArea3, "Computer 1", "");
-                game.printUserGameArea(computerGameArea2, "Computer 2", "");
-                game.computerHardLevelShoot(computerGameArea3, computerShips3, "Computer 1", "");
-                if (game.checkComputerWin(computerGameArea2, computerGameArea3, false, "Computer 2", "").Item1)
-                    break;
-                game.computerHardLevelShoot(computerGameArea2, computerShips2, "Computer 1", "");
-                if (game.checkComputerWin(computerGameArea3, computerGameArea2, false, "Computer 2", "").Item1)
-                    break;
-                Thread.Sleep(500);
-            }
-
-            logger.gamePrint("Round Number: " + game.computerRoundCounter);
-            continue;
         default:
             Console.WriteLine("Please enter valid choice!!!");
             continue;
@@ -285,7 +258,7 @@ void menuScript()
 {
     Console.WriteLine("Please select the game mode");
     Console.WriteLine("____________________________");
-    Console.WriteLine("1. Traning Mode\n2. AI Mode\n3. Past Results of Traning Mode\n4. Past Result of AI Mode\n5. AI Simulator\n6. Quit");
+    Console.WriteLine("1. Traning Mode\n2. AI Mode\n3. Past Results of Traning Mode\n4. Past Result of AI Mode\n5. Quit");
 }
 
 void modeMenuScript()

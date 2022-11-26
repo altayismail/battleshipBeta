@@ -7,7 +7,7 @@ namespace battleshipBeta.Database
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("server=ISMAILALTAY; database=BattleshipDB; integrated security=true; MultipleActiveResultSets=true;");
+            optionsBuilder.UseSqlServer("server=ISMAIL; database=BattleshipDB; integrated security=true; MultipleActiveResultSets=true;");
         }
 
         public DbSet<ExcelObjectAI>? excelObjectAIs { get; set; }
