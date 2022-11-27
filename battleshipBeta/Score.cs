@@ -31,16 +31,17 @@ namespace battleshipBeta
             var scores = _context.excelObjectTuttorials
                 .ToList<ExcelObjectTuttorial>()
                 .OrderBy(x => x.Duration)
-                .Take(5);
+                .Take(10);
 
             Console.WriteLine("Score List of Tuttorial Mode");
-            Console.WriteLine("FIRSTNAME       LASTNAME        DURATION (min)");
-            Console.WriteLine("______________________________________________");
+            Console.WriteLine("FIRSTNAME       LASTNAME        DURATION (min)          Played Day/Time");
+            Console.WriteLine("________________________________________________________________________");
             foreach (var score in scores)
             {
                 Console.Write(score.Firstname + "\t\t");
                 Console.Write(score.Lastname + "\t\t");
-                Console.Write(string.Format("{0:0.00}", score.Duration) + "\n");
+                Console.Write(string.Format("{0:0.00}", score.Duration) + "\t\t\t");
+                Console.Write(score.PlayedTime.ToString() + "\n");
             }
             Console.WriteLine("______________________________");
         }
@@ -50,21 +51,23 @@ namespace battleshipBeta
             var scores = _context.excelObjectAIs
                 .ToList<ExcelObjectAI>()
                 .OrderBy(x => x.Duration)
-                .Take(5);
+                .Take(10);
 
             Console.WriteLine("Score List of AI Mode");
-            Console.WriteLine("FIRSTNAME       LASTNAME        MODE            DURATION (min)       RESULT");
-            Console.WriteLine("____________________________________________________________________________");
+            Console.WriteLine("FIRSTNAME       LASTNAME        MODE            DURATION (min)          Played Day/Time         RESULT");
+            Console.WriteLine("_______________________________________________________________________________________________________");
             foreach (var score in scores)
             {
                 Console.Write(score.Firstname + "\t\t");
                 Console.Write(score.Lastname + "\t\t");
                 Console.Write(score.Mode + "\t\t");
-                Console.Write(string.Format("{0:0.00}", score.Duration) + "\t\t");
-                if(score.isUserWinner == false) 
-                    Console.Write("     Loser" + "\n");
+                Console.Write(string.Format("{0:0.00}", score.Duration) + "\t\t\t");
+                Console.Write(score.PlayedTime.ToString() + "\t");
+                if (score.isUserWinner == false) 
+                    Console.Write("Loser" + "\n");
                 else
-                    Console.Write("     Winner" + "\n");
+                    Console.Write("Winner" + "\n");
+
             }
             Console.WriteLine("______________________________");
         }

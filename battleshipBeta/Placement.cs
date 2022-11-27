@@ -5,14 +5,10 @@ namespace battleshipBeta
     public class Placement
     {
         private readonly Game _game;
-        private readonly Logger _logger;
-        private readonly Random _random;
 
-        public Placement(Game game, Logger logger, Random random)
+        public Placement(Game game)
         {
             _game = game;
-            _logger = logger;
-            _random = random;
         }
         //dynamic placement mechanism
         public void placementMechanism(int[,] gameArea, Ship ship)
@@ -31,22 +27,20 @@ namespace battleshipBeta
                 else
                     ship.VerorHor = false;
 
-                
-
                 //check vertical or horizontal placement
                 if (ship.VerorHor == true)
                 {
-                    if (_game.checkOneSquareRuleinHorizontal(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
+                    if (checkOneSquareRuleinHorizontal(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
                         continue;
-                    _game.horizontalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
+                    horizontalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
                     setShipLocation(ship);
                     break;
                 }
                 else
                 {
-                    if (_game.checkOneSquareRuleinVertical(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
+                    if (checkOneSquareRuleinVertical(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
                         continue;
-                    _game.verticalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
+                    verticalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
                     setShipLocation(ship);
                     break;
                 }
@@ -104,18 +98,18 @@ namespace battleshipBeta
                 //check vertical or horizontal placement
                 if (ship.VerorHor == true)
                 {
-                    if (_game.checkOneSquareRuleinHorizontal(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
+                    if (checkOneSquareRuleinHorizontal(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
                         continue;
-                    _game.horizontalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
+                    horizontalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
                     ship.isShipPlaced = true;
                     setShipLocation(ship);
                     break;
                 }
                 else
                 {
-                    if (_game.checkOneSquareRuleinVertical(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
+                    if (checkOneSquareRuleinVertical(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex))
                         continue;
-                    _game.verticalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
+                    verticalPlacement(gameArea, ship.StartIndex, ship.EndIndex, ship.LocationIndex);
                     ship.isShipPlaced = true;
                     setShipLocation(ship);
                     break;
@@ -130,6 +124,24 @@ namespace battleshipBeta
             foreach (var ship in ships)
             {
                 placementMechanism(userGameArea, ship);
+            }
+        }
+
+        //this function place the ships to game are in horizontal
+        public void horizontalPlacement(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
+        {
+            for (int i = startIndex; i < endIndex; i++)
+            {
+                gameArea[locationIndex, i] = 1;
+            }
+        }
+
+        //this function place the ships to game are in vertical
+        public void verticalPlacement(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
+        {
+            for (int i = startIndex; i < endIndex; i++)
+            {
+                gameArea[i, locationIndex] = 1;
             }
         }
 
@@ -253,6 +265,38 @@ namespace battleshipBeta
                     ship.YLocations.Add(ship.LocationIndex);
                 }
             }
+        }
+
+        //check overlap and one square rule for horizontal placement
+        public bool checkOneSquareRuleinHorizontal(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
+        {
+            for (int i = locationIndex - 1; i <= locationIndex + 1; i++)
+            {
+                for (int j = startIndex - 1; j <= endIndex + 1; j++)
+                {
+                    if (i > 9 || i < 0 || j < 0 || j > 9)
+                        continue;
+                    if (gameArea[i, j] == 1)
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        //check overlap and one square rule for vertical placement
+        public bool checkOneSquareRuleinVertical(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
+        {
+            for (int i = locationIndex - 1; i <= locationIndex + 1; i++)
+            {
+                for (int j = startIndex - 1; j <= endIndex + 1; j++)
+                {
+                    if (i > 9 || i < 0 || j < 0 || j > 9)
+                        continue;
+                    if (gameArea[j, i] == 1)
+                        return true;
+                }
+            }
+            return false;
         }
     }
 }

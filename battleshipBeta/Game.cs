@@ -8,60 +8,6 @@ namespace battleshipBeta
         //2 means there is a ship and it was shooted, 3 means there is no ship but it was fail shoot
         //verorhor variable means false is vertical placement, true is horizontal placement
 
-        public int[,] getPerfectProbability(List<Ship> ships, int[,] userGameArea)
-        {
-            int[,] perfectProbability = new int[10, 10];
-            foreach (var ship in ships.Where(x => x.isShipSinked == false))
-            {
-                for (int i = 0; i < 10; i++)
-                {
-                    for (int j = 0; j < 10; j++)
-                    {
-                        for (int k = 0; k < ship.Length; k++)
-                        {
-                            if (j + (ship.Length - 2) >= 9)
-                                break;
-                            if (userGameArea[i, j] == 2 || userGameArea[i, j] == 3 || userGameArea[i, j] == 4)
-                            {
-                                perfectProbability[i, j] = 0;
-                                int temp = k;
-                                for (k = 0; k < temp; k++)
-                                {
-                                    perfectProbability[i, j + k] -= 1;
-                                }
-                                break;
-                            }
-                            perfectProbability[i, j + k] += 1;
-                        }
-                    }
-                }
-
-                for (int i = 0; i < 10; i++)
-                {
-                    for (int j = 0; j < 10; j++)
-                    {
-                        for (int k = 0; k < ship.Length; k++)
-                        {
-                            if (j + (ship.Length - 2) >= 9)
-                                break;
-                            if (userGameArea[j, i] == 2 ||  userGameArea[j, i] == 3 || userGameArea[j, i] == 4)
-                            {
-                                perfectProbability[j, i] = 0;
-                                int temp = k;
-                                for (k = 0; k < temp; k++)
-                                {
-                                    perfectProbability[j + k, i] -= 1;
-                                }
-                                break;
-                            }
-                            perfectProbability[j + k, i] += 1;
-                        }
-                    }
-                }
-            }
-            return perfectProbability;
-        }
-
         List<(int, int)> edgeIndexs = new List<(int, int)>
         {
             (0, 0), (2, 0), (4, 0), (6, 0), (8, 0),
@@ -141,114 +87,15 @@ namespace battleshipBeta
             return gameArea;
         }
 
-        //check overlap and one square rule for horizontal placement
-        public bool checkOneSquareRuleinHorizontal(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
-        {
-            for (int i = locationIndex - 1; i <= locationIndex + 1; i++)
-            {
-                for (int j = startIndex - 1; j <= endIndex + 1; j++)
-                {
-                    if (i > 9 || i < 0 || j < 0 || j > 9)
-                        continue;
-                    if (gameArea[i, j] == 1)
-                        return true;
-                }
-            }
-            return false;
-        }
-
-        //check overlap and one square rule for vertical placement
-        public bool checkOneSquareRuleinVertical(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
-        {
-            for (int i = locationIndex - 1; i <= locationIndex + 1; i++)
-            {
-                for (int j = startIndex - 1; j <= endIndex + 1; j++)
-                {
-                    if (i > 9 || i < 0 || j < 0 || j > 9)
-                        continue;
-                    if (gameArea[j, i] == 1)
-                        return true;
-                }
-            }
-            return false;
-        }
-
-        //computer recognize that it should not shoot one squared index
-        public void recognizeOneSqureRule(int[,] userGameArea, Ship ship)
-        {
-            if(ship.VerorHor == false)
-            {
-                for (int i = ship.LocationIndex - 1; i <= ship.LocationIndex + 1; i++)
-                {
-                    for (int j = ship.StartIndex - 1; j <= ship.EndIndex; j++)
-                    {
-                        if (i > 9 || i < 0 || j < 0 || j > 9)
-                            continue;
-                        if(i == ship.LocationIndex - 1 || i == ship.LocationIndex + 1)
-                        {
-                            userGameArea[j, i] = 4;
-                        }
-                        if (i == ship.LocationIndex && j == ship.StartIndex - 1)
-                        {
-                            userGameArea[j, i] = 4;
-                        }
-                        else if(i == ship.LocationIndex && j == ship.EndIndex)
-                        {
-                            userGameArea[j, i] = 4;
-                        }
-                    }
-                }
-            }
-            else if(ship.VerorHor == true)
-            {
-                for (int i = ship.LocationIndex - 1; i <= ship.LocationIndex + 1; i++)
-                {
-                    for (int j = ship.StartIndex - 1; j <= ship.EndIndex; j++)
-                    {
-                        if (i > 9 || i < 0 || j < 0 || j > 9)
-                            continue;
-                        if (i == ship.LocationIndex - 1 || i == ship.LocationIndex + 1)
-                        {
-                            userGameArea[i, j] = 4;
-                        }
-                            
-                        if (i == ship.LocationIndex && j == ship.StartIndex - 1)
-                        {
-                            userGameArea[i, j] = 4;
-                        }
-                        else if (i == ship.LocationIndex && j == ship.EndIndex)
-                        {
-                            userGameArea[i, j] = 4;
-                        }  
-                    }
-                }
-            }
-        }
-
-        //this function place the ships to game are in horizontal
-        public void horizontalPlacement(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
-        {
-            for (int i = startIndex; i < endIndex; i++)
-            {
-                gameArea[locationIndex, i] = 1;
-            }
-        }
-
-        //this function place the ships to game are in vertical
-        public void verticalPlacement(int[,] gameArea, int startIndex, int endIndex, int locationIndex)
-        {
-            for (int i = startIndex; i < endIndex; i++)
-            {
-                gameArea[i, locationIndex] = 1;
-            }
-        }
-
         //user shoot mechanism
         public void userShoot(int[,] computerGameArea, List<Ship> computerShips)
         {
             while (true)
             {
                 checkShipIsFullySinkedforUser(computerShips, computerGameArea);
+
+                if (checkAllShipsAreFound(computerShips))
+                    break;
                 Console.WriteLine("Please enter X coordinate!");
                 _logger.inputer("X: ");
                 var x_axis = Console.ReadLine();
@@ -321,36 +168,36 @@ namespace battleshipBeta
         //this function is focus on when it founds a success shot and try to find other piece of ship
         public (int, int) shootInRow(int X, int Y, int[,] userGameArea)
         {
-            if(!(Y - 1 <= 0))
+            if(!(Y - 1 <= -1))
             {
-                if (userGameArea[getNorthCoordinate(X, Y, userGameArea).Item1, getNorthCoordinate(X, Y, userGameArea).Item2] != 2 && userGameArea[getNorthCoordinate(X, Y, userGameArea).Item1, getNorthCoordinate(X, Y, userGameArea).Item2] != 3 && userGameArea[getNorthCoordinate(X, Y, userGameArea).Item1, getNorthCoordinate(X, Y, userGameArea).Item2] != 4)
+                if (userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 2 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 3 && userGameArea[getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2] != 4)
                 {
                     direction = "North";
-                    return (getNorthCoordinate(X, Y, userGameArea).Item1, getNorthCoordinate(X, Y, userGameArea).Item2);
+                    return (getNorthCoordinate(X, Y).Item1, getNorthCoordinate(X, Y).Item2);
                 }
             }
             if(!(Y + 1 >= 10))
             {
-                if (userGameArea[getSouthCoordinate(X, Y, userGameArea).Item1, getSouthCoordinate(X, Y, userGameArea).Item2] != 2 && userGameArea[getSouthCoordinate(X, Y, userGameArea).Item1, getSouthCoordinate(X, Y, userGameArea).Item2] != 3 && userGameArea[getSouthCoordinate(X, Y, userGameArea).Item1, getSouthCoordinate(X, Y, userGameArea).Item2] != 4)
+                if (userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 2 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 3 && userGameArea[getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2] != 4)
                 {
                     direction = "South";
-                    return (getSouthCoordinate(X, Y, userGameArea).Item1, getSouthCoordinate(X, Y, userGameArea).Item2);
+                    return (getSouthCoordinate(X, Y).Item1, getSouthCoordinate(X, Y).Item2);
                 }
             }
             if(!(X + 1 >= 10))
             {
-                if (userGameArea[getEastCoordinate(X, Y, userGameArea).Item1, getEastCoordinate(X, Y, userGameArea).Item2] != 2 && userGameArea[getEastCoordinate(X, Y, userGameArea).Item1, getEastCoordinate(X, Y, userGameArea).Item2] != 3 && userGameArea[getEastCoordinate(X, Y, userGameArea).Item1, getEastCoordinate(X, Y, userGameArea).Item2] != 4 )
+                if (userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 2 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 3 && userGameArea[getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2] != 4 )
                 {
                     direction = "East";
-                    return (getEastCoordinate(X, Y, userGameArea).Item1, getEastCoordinate(X, Y, userGameArea).Item2);
+                    return (getEastCoordinate(X, Y).Item1, getEastCoordinate(X, Y).Item2);
                 }
             }
-            if(!(X - 1 <= 0))
+            if(!(X - 1 <= -1))
             {
-                if (userGameArea[getWestCoordinate(X, Y, userGameArea).Item1, getWestCoordinate(X, Y, userGameArea).Item2] != 2 && userGameArea[getWestCoordinate(X, Y, userGameArea).Item1, getWestCoordinate(X, Y, userGameArea).Item2] != 3 && userGameArea[getWestCoordinate(X, Y, userGameArea).Item1, getWestCoordinate(X, Y, userGameArea).Item2] != 4)
+                if (userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 2 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 3 && userGameArea[getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2] != 4)
                 {
                     direction = "West";
-                    return (getWestCoordinate(X, Y, userGameArea).Item1, getWestCoordinate(X, Y, userGameArea).Item2);
+                    return (getWestCoordinate(X, Y).Item1, getWestCoordinate(X, Y).Item2);
                 }
             }
             return (X, Y);
@@ -365,6 +212,9 @@ namespace battleshipBeta
                 int Y;
 
                 checkShipIsFullySinkedforComputer(userShips, userGameArea);
+
+                if (checkAllShipsAreFound(userShips))
+                    break;
 
                 if (isShipFound == true && lastShotSuccess == true && direction == null)
                 {
@@ -455,45 +305,158 @@ namespace battleshipBeta
         //these functions are return the coordinate index according to the direction
         public (int, int) getNorthCoordinate(int X, int Y, int[,] userGameArea)
         {
-            if(Y - 1 < 0 && userGameArea[X,Y] == 3 && userGameArea[X, Y] == 4)
+            if(Y - 1 < 0)
             {
                 direction = "South";
-                return (shipFoundStartPoint.Item1 + 1, shipFoundStartPoint.Item2);
+                return (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 + 1 );
             }  
+            if(userGameArea[X, Y - 1] == 3 || userGameArea[X, Y - 1] == 4)
+            {
+                direction = "South";
+                return (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 + 1);
+            }
+            return (X, Y - 1);
+        }
+
+        public (int, int) getNorthCoordinate(int X, int Y)
+        {
             return (X, Y - 1);
         }
 
         public (int, int) getSouthCoordinate(int X, int Y, int[,] userGameArea)
         {
-            if (Y + 1 > 9 && userGameArea[X, Y] == 3 && userGameArea[X, Y] == 4)
+            if (Y + 1 > 9)
             {
                 direction = "North";
-                return (shipFoundStartPoint.Item1 -1, shipFoundStartPoint.Item2);
+                return (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 - 1);
             }
+            if(userGameArea[X, Y + 1] == 3 || userGameArea[X, Y + 1] == 4)
+            {
+                direction = "North";
+                return (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 - 1);
+            }
+            return (X, Y + 1);
+        }
+
+        public (int, int) getSouthCoordinate(int X, int Y)
+        {
             return (X, Y + 1);
         }
 
         public (int, int) getEastCoordinate(int X, int Y, int[,] userGameArea)
         {
-            if (X + 1 > 9 && userGameArea[X, Y] == 3 && userGameArea[X, Y] == 4)
+            if (X + 1 > 9)
             {
                 direction = "West";
-                return (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 - 1);
+                return (shipFoundStartPoint.Item1 - 1, shipFoundStartPoint.Item2);
             }
+            if(userGameArea[X + 1, Y] == 3 || userGameArea[X + 1, Y] == 4)
+            {
+                direction = "West";
+                return (shipFoundStartPoint.Item1 - 1, shipFoundStartPoint.Item2);
+            }
+            return (X + 1, Y);
+        }
+
+        public (int, int) getEastCoordinate(int X, int Y)
+        {
             return (X + 1, Y);
         }
 
         public (int, int) getWestCoordinate(int X, int Y, int[,] userGameArea)
         {
-            if (X - 1 < 0 && userGameArea[X, Y] == 3 && userGameArea[X, Y] == 4)
+            if (X - 1 < 0)
             {
                 direction = "East";
-                return (shipFoundStartPoint.Item1, shipFoundStartPoint.Item2 + 1);
+                return (shipFoundStartPoint.Item1 + 1, shipFoundStartPoint.Item2);
+            }
+            if(userGameArea[X - 1, Y] == 3 || userGameArea[X - 1, Y] == 4)
+            {
+                direction = "East";
+                return (shipFoundStartPoint.Item1 + 1, shipFoundStartPoint.Item2);
             }
             return (X - 1, Y);
         }
 
-        //computer hard level shoot mechanism
+        public (int, int) getWestCoordinate(int X, int Y)
+        {
+            return (X - 1, Y);
+        }
+
+        public int[,] getPerfectProbability(List<Ship> ships, int[,] userGameArea)
+        {
+            int[,] perfectProbability = new int[10, 10];
+            foreach (var ship in ships.Where(x => x.isShipSinked == false))
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    for (int j = 0; j < 10; j++)
+                    {
+                        for (int k = 0; k < ship.Length; k++)
+                        {
+                            if (j + k > 9 || j + (ship.Length - 2) >= 9)
+                                break;
+                            if (userGameArea[i, j] == 2 || userGameArea[i, j] == 3 || userGameArea[i, j] == 4)
+                            {
+                                int temp = k;
+                                for (k = 0; k < temp; k++)
+                                {
+                                    perfectProbability[i, j + k] -= 1;
+                                }
+                                perfectProbability[i, j + k] = 0;
+                                break;
+                            }
+                            perfectProbability[i, j + k] += 1;
+                        }
+                    }
+                }
+
+                for (int i = 0; i < 10; i++)
+                {
+                    for (int j = 0; j < 10; j++)
+                    {
+                        for (int k = 0; k < ship.Length; k++)
+                        {
+                            if (j + k > 9 || j + (ship.Length - 2) >= 9)
+                                break;
+                            if (userGameArea[j, i] == 2 || userGameArea[j, i] == 3 || userGameArea[j, i] == 4)
+                            {
+                                int temp = k;
+                                for (k = 0; k < temp; k++)
+                                {
+                                    perfectProbability[j + k, i] -= 1;
+                                }
+                                perfectProbability[j + k, i] = 0;
+                                break;
+                            }
+                            perfectProbability[j + k, i] += 1;
+                        }
+                    }
+                }
+            }
+            return perfectProbability;
+        }
+
+        //This is a shoot decider when computer does not focus on a ship
+        public (int, int) randomShootDecider(int[,] userGameArea, List<Ship> userShips)
+        {
+            int X;
+            int Y;
+
+            if (computerRoundCounter > 10)
+            {
+                int maxProbabilty = getPerfectProbability(userShips, userGameArea).Cast<int>().Max();
+                (X, Y) = CoordinatesOf(getPerfectProbability(userShips, userGameArea), maxProbabilty);
+            }
+            else
+            {
+                X = _random.Next(10);
+                Y = _random.Next(10);
+            }
+            return (X, Y);
+        }
+
+        //computer medium level shoot mechanism
         public void computerMediumLevelShoot(int[,] userGameArea, List<Ship> userShips, string firstname, string lastname)
         {
             while (true)
@@ -502,6 +465,9 @@ namespace battleshipBeta
                 int Y;
 
                 checkShipIsFullySinkedforComputer(userShips, userGameArea);
+
+                if (checkAllShipsAreFound(userShips))
+                    break;
 
                 if (isShipFound == true && lastShotSuccess == true && direction == null)
                     (X, Y) = shootInRow(lastShootedIndex.Item1, lastShootedIndex.Item2, userGameArea);
@@ -606,25 +572,6 @@ namespace battleshipBeta
             }
         }
 
-        //This is a decider when computer randomly shoots
-        public (int, int) randomShootDecider(int[,] userGameArea, List<Ship> userShips)
-        {
-            int X;
-            int Y;
-
-            if (computerRoundCounter > 4)
-            {
-                int maxProbabilty = getPerfectProbability(userShips, userGameArea).Cast<int>().Max();
-                (X, Y) = CoordinatesOf(getPerfectProbability(userShips, userGameArea), maxProbabilty);
-            }
-            else
-            {
-                X = _random.Next(10);
-                Y = _random.Next(10);
-            }
-            return (X, Y);
-        }
-
         // This is method for computer try to found ships on Edges
         public (int ,int) tryToFindShipsOnEdges(int[,] userGameArea)
         {
@@ -657,6 +604,58 @@ namespace battleshipBeta
                     return (X, Y);
                 else
                     continue;
+            }
+        }
+
+        //computer recognize that it should not shoot one squared index
+        public void recognizeOneSqureRule(int[,] userGameArea, Ship ship)
+        {
+            if (ship.VerorHor == false)
+            {
+                for (int i = ship.LocationIndex - 1; i <= ship.LocationIndex + 1; i++)
+                {
+                    for (int j = ship.StartIndex - 1; j <= ship.EndIndex; j++)
+                    {
+                        if (i > 9 || i < 0 || j < 0 || j > 9)
+                            continue;
+                        if (i == ship.LocationIndex - 1 || i == ship.LocationIndex + 1)
+                        {
+                            userGameArea[j, i] = 4;
+                        }
+                        if (i == ship.LocationIndex && j == ship.StartIndex - 1)
+                        {
+                            userGameArea[j, i] = 4;
+                        }
+                        else if (i == ship.LocationIndex && j == ship.EndIndex)
+                        {
+                            userGameArea[j, i] = 4;
+                        }
+                    }
+                }
+            }
+            else if (ship.VerorHor == true)
+            {
+                for (int i = ship.LocationIndex - 1; i <= ship.LocationIndex + 1; i++)
+                {
+                    for (int j = ship.StartIndex - 1; j <= ship.EndIndex; j++)
+                    {
+                        if (i > 9 || i < 0 || j < 0 || j > 9)
+                            continue;
+                        if (i == ship.LocationIndex - 1 || i == ship.LocationIndex + 1)
+                        {
+                            userGameArea[i, j] = 4;
+                        }
+
+                        if (i == ship.LocationIndex && j == ship.StartIndex - 1)
+                        {
+                            userGameArea[i, j] = 4;
+                        }
+                        else if (i == ship.LocationIndex && j == ship.EndIndex)
+                        {
+                            userGameArea[i, j] = 4;
+                        }
+                    }
+                }
             }
         }
 
@@ -767,16 +766,6 @@ namespace battleshipBeta
         }
 
         //this function checks if all ships are found and help to end game
-        public int checkAllShipsAreFound(int[,] gameArea)
-        {
-            List<int> oneDimension = new List<int>();
-            foreach (var a in gameArea)
-            {
-                oneDimension.Add(a);
-            }
-            return oneDimension.Count(x => x.Equals(2));
-        }
-
         public bool checkAllShipsAreFound(List<Ship> ships)
         {
             if(ships.All(x => x.isShipSinked == true))
@@ -784,7 +773,36 @@ namespace battleshipBeta
             return false;
         }
 
-        //this is a helper function for srandom ship placement
+        public (bool,bool) checkUserWin(List<Ship> ships, string firstname, string lastname, int[,] computerGameArea, int[,] userGameArea, bool isUserWinner)
+        {
+            if(checkAllShipsAreFound(ships))
+            {
+                _logger.gamePrint($"Congrats, you found all the ships in {userRoundCounter} round!!!");
+                _logger.gamePrint($"Winner: {firstname} {lastname}");
+                Console.WriteLine("Last Situation \n___________________________________________");
+                printComputerGameArea(computerGameArea);
+                printUserGameArea(userGameArea, firstname, lastname);
+                isUserWinner = true;
+                return (true, isUserWinner);
+            }
+            return (false, isUserWinner);
+        }
+
+        public (bool,bool) checkComputerWin(List<Ship> ships, int[,] computerGameArea, int[,] userGameArea, bool isUserWinner)
+        {
+            if (checkAllShipsAreFound(ships))
+            {
+                _logger.gamePrint($"Nice try, Computer found all the ships in {computerRoundCounter} round!!!");
+                Console.WriteLine("Last Situation \n___________________________________________");
+                printComputerGameArea(computerGameArea);
+                printUserGameArea(userGameArea, "User", "");
+                isUserWinner = false;
+                return (true, isUserWinner);
+            }
+            return (false, isUserWinner);
+        }
+
+        //this is a helper function for random ship placement
         public (int,int,int) randomIndexing(int shipLength)
         {
             var locationIndex = _random.Next(10);
@@ -837,36 +855,6 @@ namespace battleshipBeta
             }
 
             return (firstname, lastname);
-        }
-
-        //Following 2 function checks if the game is end or not
-        public (bool, bool) checkUserWin(int[,] computerGameArea, int[,] userGameArea, string firstname, string lastname, bool isUserWinner)
-        {
-            if (checkAllShipsAreFound(computerGameArea) == 17)
-            {
-                _logger.gamePrint($"Congrats, you found all the ships in {userRoundCounter} round!!!");
-                _logger.gamePrint($"Winner: {firstname} {lastname}");
-                Console.WriteLine("Last Situation \n___________________________________________");
-                printComputerGameArea(computerGameArea);
-                printUserGameArea(userGameArea, firstname, lastname);
-                isUserWinner = true;
-                return (true, isUserWinner);
-            }
-            return (false, isUserWinner);
-        }
-
-        public (bool, bool) checkComputerWin(int[,] userGameArea, int[,] computerGameArea, bool isUserWinner, string firstname, string lastname)
-        {
-            if (checkAllShipsAreFound(userGameArea) == 17)
-            {
-                _logger.gamePrint($"Nice try, Computer found all the ships in {computerRoundCounter} round!!!");
-                Console.WriteLine("Last Situation \n___________________________________________");
-                printComputerGameArea(computerGameArea);
-                printUserGameArea(userGameArea, firstname, lastname);
-                isUserWinner = false;
-                return (true, isUserWinner);
-            }
-            return (false, isUserWinner);
         }
 
         //Returns cordinate of a value in 2D array

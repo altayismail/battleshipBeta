@@ -11,5 +11,6 @@ namespace battleshipBeta.Entities
         public string? Mode { get; set; }
         public double Duration { get; set; }
         public bool isUserWinner { get; set; }
+        public DateTime PlayedTime { get; set; }
     }
 }

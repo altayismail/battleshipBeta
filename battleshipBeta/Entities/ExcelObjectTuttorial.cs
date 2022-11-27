@@ -9,5 +9,6 @@ namespace battleshipBeta.Entities
         public string? Firstname { get; set; }
         public string? Lastname { get; set; }
         public double Duration { get; set; }
+        public DateTime PlayedTime { get; set; }
     }
 }
