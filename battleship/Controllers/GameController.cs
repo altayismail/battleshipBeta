@@ -126,7 +126,7 @@ namespace battleship.Controllers
                     _memoryDatabase.Users.Last().EndTime = DateTime.Now;
                     _memoryDatabase.SaveChanges();
                     ExcelObjectAI ai_score = new ExcelObjectAI()
-                    { Firstname = _memoryDatabase.Users.Single().Firstname, Lastname = _memoryDatabase.Users.Single().Lastname, Duration = (_memoryDatabase.Users.Last().EndTime - _memoryDatabase.Users.Last().StartTime).TotalMinutes, PlayedTime = _memoryDatabase.Users.Last().StartTime, isUserWinner = true, Mode = "Hard" };
+                    { Firstname = _memoryDatabase.Users.Last().Firstname, Lastname = _memoryDatabase.Users.Last().Lastname, Duration = (_memoryDatabase.Users.Last().EndTime - _memoryDatabase.Users.Last().StartTime).TotalMinutes, PlayedTime = _memoryDatabase.Users.Last().StartTime, isUserWinner = true, Mode = "Hard" };
                     score.createScoreforAI(ai_score);
                     return RedirectToAction("GetAIScores", "Score");
                 }
@@ -284,7 +284,7 @@ namespace battleship.Controllers
                     _memoryDatabase.Users.Last().EndTime = DateTime.Now;
                     _memoryDatabase.SaveChanges();
                     ExcelObjectAI ai_score = new ExcelObjectAI()
-                    { Firstname = _memoryDatabase.Users.Single().Firstname, Lastname = _memoryDatabase.Users.Single().Lastname, Duration = (_memoryDatabase.Users.Last().EndTime - _memoryDatabase.Users.Last().StartTime).TotalMinutes, PlayedTime = _memoryDatabase.Users.Last().StartTime, isUserWinner = true, Mode = "Medium" };
+                    { Firstname = _memoryDatabase.Users.Last().Firstname, Lastname = _memoryDatabase.Users.Last().Lastname, Duration = (_memoryDatabase.Users.Last().EndTime - _memoryDatabase.Users.Last().StartTime).TotalMinutes, PlayedTime = _memoryDatabase.Users.Last().StartTime, isUserWinner = true, Mode = "Medium" };
                     score.createScoreforAI(ai_score);
                     return RedirectToAction("GetAIScores", "Score");
                 }
@@ -438,7 +438,7 @@ namespace battleship.Controllers
                     _memoryDatabase.Users.Last().EndTime = DateTime.Now;
                     _memoryDatabase.SaveChanges();
                     ExcelObjectAI ai_score = new ExcelObjectAI()
-                    { Firstname = _memoryDatabase.Users.Single().Firstname, Lastname = _memoryDatabase.Users.Single().Lastname, Duration = (_memoryDatabase.Users.Last().EndTime - _memoryDatabase.Users.Last().StartTime).TotalMinutes, PlayedTime = _memoryDatabase.Users.Last().StartTime, isUserWinner = true, Mode = "Easy" };
+                    { Firstname = _memoryDatabase.Users.Last().Firstname, Lastname = _memoryDatabase.Users.Last().Lastname, Duration = (_memoryDatabase.Users.Last().EndTime - _memoryDatabase.Users.Last().StartTime).TotalMinutes, PlayedTime = _memoryDatabase.Users.Last().StartTime, isUserWinner = true, Mode = "Easy" };
                     score.createScoreforAI(ai_score);
                     return RedirectToAction("GetAIScores", "Score");
                 }
@@ -553,13 +553,13 @@ namespace battleship.Controllers
                 _memoryDatabase.Users.Last().EndTime = DateTime.Now;
                 _memoryDatabase.SaveChanges();
                 ExcelObjectTuttorial T_score = new ExcelObjectTuttorial()
-                { Firstname = _memoryDatabase.Users.Single().Firstname, Lastname = _memoryDatabase.Users.Single().Lastname, Duration = (_memoryDatabase.Users.Last().EndTime - _memoryDatabase.Users.Last().StartTime).TotalMinutes, PlayedTime = _memoryDatabase.Users.Last().StartTime };
+                { Firstname = _memoryDatabase.Users.Last().Firstname, Lastname = _memoryDatabase.Users.Last().Lastname, Duration = (_memoryDatabase.Users.Last().EndTime - _memoryDatabase.Users.Last().StartTime).TotalMinutes, PlayedTime = _memoryDatabase.Users.Last().StartTime };
                 score.createScoreforTuttorial(T_score);
                 ViewBag.WinMessage = $"Congrats, You found the all the ships in {(_memoryDatabase.Users.Last().EndTime - _memoryDatabase.Users.Last().StartTime).TotalMinutes} minutes.";
                 return RedirectToAction("GetTuttorialScores", "Score");
             }
 
-            _memoryDatabase.Users.Single().UserRoundCounter++;
+            _memoryDatabase.Users.Last().UserRoundCounter++;
             _memoryDatabase.SaveChanges();
 
             return RedirectToAction("TuttorialMode","Game");

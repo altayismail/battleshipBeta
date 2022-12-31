@@ -471,6 +471,7 @@ namespace battleshipBeta
         }
 
         //these functions are return the coordinate index according to the direction
+        //there are override functions which are for MVC arch and you can recognize them from MVC tags in variables
         public (int, int) getNorthCoordinate(int X, int Y, int[,] userGameArea)
         {
             if(Y - 1 < 0)
@@ -671,7 +672,7 @@ namespace battleshipBeta
             int X;
             int Y;
 
-            if (computerRoundCounter > 10)
+            if (computerRoundCounter > 0)
             {
                 int maxProbabilty = getPerfectProbability(userShips, userGameArea).Cast<int>().Max();
                 (X, Y) = CoordinatesOf(getPerfectProbability(userShips, userGameArea), maxProbabilty);
