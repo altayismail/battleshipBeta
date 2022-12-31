@@ -12,19 +12,39 @@ Score score = new Score(context);
 Console.WriteLine("Welcome To Battle Ship!!!!");
 while (true)
 {
+    Ship computerAircraft = new Ship(5, "Computer Aircraft Carrier", 1);
+    Ship computerBattleship = new Ship(4, "Computer Battleship", 2);
+    Ship computerCruiser = new Ship(3, "Computer Cruiser", 3);
+    Ship computerSubmarine = new Ship(3, "Computer Submarine", 4);
+    Ship computerDestroyer = new Ship(2, "Computer Destroyer", 5);
+
+    Ship userAircraft = new Ship(5, "User Aircraft Carrier", 1);
+    Ship userBattleship = new Ship(4, "User Battleship", 2);
+    Ship userCruiser = new Ship(3, "User Cruiser", 3);
+    Ship userSubmarine = new Ship(3, "User Submarine", 4);
+    Ship userDestroyer = new Ship(2, "User Destroyer", 5);
+
+    int computerRoundCounter = 0;
+    int userRoundCounter = 0;
+
+    List<Ship> computerShips = game.getListOfComputerShip(computerAircraft, computerBattleship, computerCruiser, computerSubmarine, computerDestroyer);
+    List<Ship> userShips = game.getListOfUserShip(userAircraft, userBattleship, userCruiser, userSubmarine, userDestroyer);
+
+    int[,] computerGameArea = game.createGameArea();
+    int[,] userGameArea = game.createGameArea();
+
     menuScript();
     logger.inputer("Choice: ");
     var gameModeChoice = Console.ReadLine();
     if (gameModeChoice == "5")
         break;
 
+
     Console.WriteLine("____________________________");
     switch (gameModeChoice)
     {
         case "1":
-            List<Ship> t_computerShips = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
-            int[,] computerGameArea = game.createGameArea();
-            placement.placeAllComputerShip(computerGameArea, t_computerShips);
+            placement.placeAllComputerShip(computerGameArea, computerShips);
             Console.WriteLine("Welcome to the Traning Mode...");
             Console.WriteLine("____________________________");
             var (t_firstname, t_lastname) = game.nameAndSurnameInput();
@@ -33,8 +53,9 @@ while (true)
             while (true)
             {
                 game.printComputerGameArea(computerGameArea);
-                game.userShoot(computerGameArea, t_computerShips);
-                if (game.checkUserWin(t_computerShips, t_firstname, t_lastname, computerGameArea, computerGameArea, true).Item1)
+                game.userShoot(computerGameArea, computerShips);
+                userRoundCounter++;
+                if (game.checkUserWin(computerShips, t_firstname, t_lastname, computerGameArea, computerGameArea, true, userRoundCounter).Item1)
                     break;
             }
 
@@ -58,13 +79,9 @@ while (true)
                 case "1":
                     Console.WriteLine("Welcome to the AI Easy Level...");
                     Console.WriteLine("____________________________");
-                    List<Ship> easy_userShips = game.getListOfUserShip(game.userAdmiral, game.userCruiser, game.userDestroyer, game.userDestroyer2, game.userAssault);
-                    List<Ship> easy_computerShips = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
                     var (easy_firstname, easy_lastname) = game.nameAndSurnameInput();
-                    int[,] easy_computerGameArea = game.createGameArea();
-                    placement.placeAllComputerShip(easy_computerGameArea, easy_computerShips);
-                    int[,] easy_userGameArea = game.createGameArea();
-
+                    placement.placeAllComputerShip(computerGameArea, computerShips);
+                    
                     string easy_placement_type_choice = null;
                     while (true)
                     {
@@ -81,12 +98,12 @@ while (true)
                     }
 
                     if (easy_placement_type_choice == "y")
-                        placement.placeAllUserShip(easy_userGameArea, easy_userShips);
+                        placement.placeAllUserShip(userGameArea, userShips);
                     else if (easy_placement_type_choice == "n")
                     {
-                        for (int i = 0; i < easy_userShips.Count; i++)
+                        for (int i = 0; i < userShips.Count; i++)
                         {
-                            placement.placementMechanismForUser(easy_userGameArea, easy_userShips, easy_firstname, easy_lastname);
+                            placement.placementMechanismForUser(userGameArea, userShips, easy_firstname, easy_lastname);
                         }
                     }
 
@@ -94,13 +111,15 @@ while (true)
                     DateTime easy_startTime = DateTime.Now;
                     while (true)
                     {
-                        game.printComputerGameArea(easy_computerGameArea);
-                        game.printUserGameArea(easy_userGameArea, easy_firstname, easy_lastname);
-                        game.userShoot(easy_computerGameArea, easy_computerShips);
-                        if (game.checkUserWin(easy_computerShips,  easy_firstname, easy_lastname, easy_computerGameArea, easy_userGameArea, easy_isUserWinner).Item1)
+                        game.printComputerGameArea(computerGameArea);
+                        game.printUserGameArea(userGameArea, easy_firstname, easy_lastname);
+                        game.userShoot(computerGameArea, computerShips);
+                        userRoundCounter++;
+                        if (game.checkUserWin(computerShips,  easy_firstname, easy_lastname, computerGameArea, userGameArea, easy_isUserWinner, userRoundCounter).Item1)
                             break;
-                        game.computerEasyLevelShoot(easy_userGameArea, easy_firstname, easy_lastname);
-                        if (game.checkComputerWin(easy_userShips, easy_userGameArea, easy_computerGameArea, easy_isUserWinner).Item1)
+                        game.computerEasyLevelShoot(userGameArea, easy_firstname, easy_lastname);
+                        computerRoundCounter++;
+                        if (game.checkComputerWin(userShips, userGameArea, computerGameArea, easy_isUserWinner, computerRoundCounter).Item1)
                             break;
                     }
 
@@ -114,12 +133,8 @@ while (true)
                 case "2":
                     Console.WriteLine("Welcome to the AI Medium Level...");
                     Console.WriteLine("____________________________");
-                    List<Ship> mid_userShips = game.getListOfUserShip(game.userAdmiral, game.userCruiser, game.userDestroyer, game.userDestroyer2, game.userAssault);
-                    List<Ship> mid_computerShips = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
                     var (mid_firstname, mid_lastname) = game.nameAndSurnameInput();
-                    int[,] mid_computerGameArea = game.createGameArea();
-                    placement.placeAllComputerShip(mid_computerGameArea, mid_computerShips);
-                    int[,] mid_userGameArea = game.createGameArea();
+                    placement.placeAllComputerShip(computerGameArea, computerShips);
 
                     string mid_placement_type_choice = null;
                     while (true)
@@ -137,12 +152,12 @@ while (true)
                     }
 
                     if (mid_placement_type_choice == "y")
-                        placement.placeAllUserShip(mid_userGameArea, mid_userShips);
+                        placement.placeAllUserShip(userGameArea, userShips);
                     else if (mid_placement_type_choice == "n")
                     {
-                        for (int i = 0; i < mid_userShips.Count; i++)
+                        for (int i = 0; i < userShips.Count; i++)
                         {
-                            placement.placementMechanismForUser(mid_userGameArea, mid_userShips, mid_firstname, mid_lastname);
+                            placement.placementMechanismForUser(userGameArea, userShips, mid_firstname, mid_lastname);
                         }
                     }
 
@@ -150,13 +165,15 @@ while (true)
                     DateTime mid_startTime = DateTime.Now;
                     while (true)
                     {
-                        game.printComputerGameArea(mid_computerGameArea);
-                        game.printUserGameArea(mid_userGameArea, mid_firstname, mid_lastname);
-                        game.userShoot(mid_computerGameArea, mid_computerShips);
-                        if (game.checkUserWin(mid_computerShips, mid_firstname, mid_lastname, mid_computerGameArea, mid_userGameArea, mid_isUserWinner).Item1)
+                        game.printComputerGameArea(computerGameArea);
+                        game.printUserGameArea(userGameArea, mid_firstname, mid_lastname);
+                        game.userShoot(computerGameArea, computerShips);
+                        userRoundCounter++;
+                        if (game.checkUserWin(computerShips, mid_firstname, mid_lastname, computerGameArea, userGameArea, mid_isUserWinner, userRoundCounter).Item1)
                             break;
-                        game.computerHardLevelShoot(mid_userGameArea, mid_userShips, mid_firstname, mid_lastname);
-                        if (game.checkComputerWin(mid_userShips,  mid_computerGameArea, mid_userGameArea, mid_isUserWinner).Item1)
+                        game.computerHardLevelShoot(userGameArea, userShips, mid_firstname, mid_lastname, computerRoundCounter);
+                        computerRoundCounter++;
+                        if (game.checkComputerWin(userShips, computerGameArea, userGameArea, mid_isUserWinner, computerRoundCounter).Item1)
                             break;
                     }
 
@@ -171,13 +188,8 @@ while (true)
                 case "3":
                     Console.WriteLine("Welcome to the AI Hard Level...");
                     Console.WriteLine("____________________________");
-
-                    List<Ship> hard_userShips = game.getListOfUserShip(game.userAdmiral, game.userCruiser, game.userDestroyer, game.userDestroyer2, game.userAssault);
-                    List<Ship> hard_computerShips = game.getListOfComputerShip(game.computerAdmiral, game.computerCruiser, game.computerDestroyer, game.comptuerDestroyer2, game.computerAssault);
                     var (hard_firstname, hard_lastname) = game.nameAndSurnameInput();
-                    int[,] hard_computerGameArea = game.createGameArea();
-                    placement.placeAllComputerShip(hard_computerGameArea, hard_computerShips);
-                    int[,] hard_userGameArea = game.createGameArea();
+                    placement.placeAllComputerShip(computerGameArea, computerShips);
 
                     string hard_placement_type_choice = null;
                     while (true)
@@ -195,12 +207,12 @@ while (true)
                     }
 
                     if (hard_placement_type_choice == "y")
-                        placement.placeAllUserShip(hard_userGameArea, hard_userShips);
+                        placement.placeAllUserShip(userGameArea, userShips);
                     else if (hard_placement_type_choice == "n")
                     {
-                        for (int i = 0; i < hard_userShips.Count; i++)
+                        for (int i = 0; i < userShips.Count; i++)
                         {
-                            placement.placementMechanismForUser(hard_userGameArea, hard_userShips, hard_firstname, hard_lastname);
+                            placement.placementMechanismForUser(userGameArea, userShips, hard_firstname, hard_lastname);
                         }
                     }
 
@@ -208,20 +220,22 @@ while (true)
                     DateTime hard_startTime = DateTime.Now;
                     while (true)
                     {
-                        game.printComputerGameArea(hard_computerGameArea);
-                        game.printUserGameArea(hard_userGameArea, hard_firstname, hard_lastname);
-                        game.userShoot(hard_computerGameArea, hard_computerShips);
-                        if (game.checkUserWin(hard_computerShips, hard_firstname, hard_lastname, hard_computerGameArea, hard_userGameArea, hard_isUserWinner).Item1)
+                        game.printComputerGameArea(computerGameArea);
+                        game.printUserGameArea(userGameArea, hard_firstname, hard_lastname);
+                        game.userShoot(computerGameArea, computerShips);
+                        userRoundCounter++;
+                        if (game.checkUserWin(computerShips, hard_firstname, hard_lastname, computerGameArea, userGameArea, hard_isUserWinner, userRoundCounter).Item1)
                             break;
-                        game.computerHardLevelShoot(hard_userGameArea, hard_userShips, hard_firstname, hard_lastname);
-                        if (game.checkComputerWin(hard_userShips, hard_computerGameArea, hard_userGameArea, hard_isUserWinner).Item1)
+                        game.computerHardLevelShoot(userGameArea, userShips, hard_firstname, hard_lastname, computerRoundCounter);
+                        computerRoundCounter++;
+                        if (game.checkComputerWin(userShips, computerGameArea, userGameArea, hard_isUserWinner, computerRoundCounter).Item1)
                             break;
                         Console.WriteLine("_________________________");
                         for (int i = 0; i < 10; i++)
                         {
                             for (int j = 0; j < 10; j++)
                             {
-                                Console.Write(game.getPerfectProbability(hard_userShips, hard_userGameArea)[j, i] + " ");
+                                Console.Write(game.getPerfectProbability(userShips, userGameArea)[j, i] + " ");
                             }
                             Console.Write("\n");
                         }
@@ -232,7 +246,7 @@ while (true)
                     double hard_duration = (hard_endTime - hard_startTime).TotalMinutes;
 
                     ExcelObjectAI hard_score = new ExcelObjectAI()
-                    { Firstname = hard_firstname, Lastname = hard_lastname, Duration = hard_duration, Mode = Modes.Mode.Hard.ToString(), isUserWinner = game.checkUserWin(hard_computerShips, hard_firstname, hard_lastname, hard_computerGameArea, hard_userGameArea, hard_isUserWinner).Item2, PlayedTime = hard_startTime };
+                    { Firstname = hard_firstname, Lastname = hard_lastname, Duration = hard_duration, Mode = Modes.Mode.Hard.ToString(), isUserWinner = game.checkUserWin(computerShips, hard_firstname, hard_lastname, computerGameArea, userGameArea, hard_isUserWinner, userRoundCounter).Item2, PlayedTime = hard_startTime };
                     score.createScoreforAI(hard_score);
 
                     break;

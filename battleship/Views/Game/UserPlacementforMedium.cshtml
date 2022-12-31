@@ -1,0 +1,107 @@
+﻿@using battleship.Models
+@model User
+@{
+    ViewData["Title"] = "Ship Placement";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="alert alert-primary d-flex align-items-centermt-5 mt-5" role="alert">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+    </svg>
+    <div>
+        Please place all the ships to start game.
+        Watch Out! X and Y coordiante that you are going to enter will be the start point of the ship for placement.
+    </div>
+</div>
+
+@if (ViewBag.Warning != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewBag.Warning
+    </div>
+}
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
+@using (Html.BeginForm("UserPlacementforMedium", "Game", FormMethod.Post))
+{
+    <form>
+        <div class="row mt-2">
+            <div class="col">
+                <label for="inputEmail4">X Coordinate for Start Point of Ship</label>
+                <input type="text" onblur="checkTextField(this);" class="form-control" placeholder="X Coordinate" name="XCoordinate" onkeypress="return /[0-9]/i.test(event.key)" maxlength="1" required>
+            </div>
+            <div class="col">
+                <label for="inputEmail4">Y Coordinate for Start Point of Ship</label>
+                <input type="text" onblur="checkTextField(this);" class="form-control" placeholder="Y Coordinate" name="YCoordinate" onkeypress="return /[0-9]/i.test(event.key)" maxlength="1" required>
+            </div>
+        </div>
+        <br />
+        @Html.LabelFor(model => model.ShipChoice, "Ship")
+        @Html.DropDownListFor(model => model.ShipChoice, Enum.GetNames(typeof(Ships)).Select(e => new SelectListItem { Text = e }), new { @class = "form-control" })
+        <br>
+        @Html.LabelFor(model => model.strVerOrHor, "Vertical & Horizontal Placement")
+        @Html.DropDownListFor(model => model.strVerOrHor, new [] { new SelectListItem { Text = "Vertical", Value="False" } , new SelectListItem { Text = "Horizontal", Value="True"} }, new { @class = "form-control" })
+        <br>
+        <div style="text-align:center;">
+            <button class="button button5 bg-primary">Place</button>
+        </div>
+        <br>
+    </form>
+
+    <div class="container" style="margin-top:25px;margin-bottom:25px;">
+        <div class="row">
+            <div class="col-3"></div>
+            <div class="col-6">
+                @{
+                    int[,] gameArea = ViewData["UserGameArea"] as int[,];
+                    <div class="row">
+                        <div class="col battleship-grid bg-white text-dark"></div>
+                        @for (int f = 0; f < 10; f++)
+                        {
+                            <div class="col battleship-grid bg-white text-dark">@f</div>
+                        }
+                    </div>
+                    for (int i = 0; i < 10; i++)
+                    {
+                        <div class="row">
+                            @{
+                                <div class="col battleship-grid bg-white text-dark">@i</div>
+                                for (int j = 0; j < 10; j++)
+                                {
+                                    if (gameArea[j, i] == 0)
+                                    {
+                                        <div class="col align-content-around battleship-grid bg-primary text-white"><i class='fas fa-water' style='font-size:9px'></i></div>
+                                    }
+                                    else if (gameArea[j, i] == 1)
+                                    {
+                                        <div class="col align-content-around battleship-grid bg-success text-white"><i class='fas fa-ship' style='font-size:9px'></i></div>
+                                    }
+                                    else if (gameArea[j, i] == 2)
+                                    {
+                                        <div class="col align-content-around battleship-grid bg-danger text-white"><i class="fa fa-fire" style="font-size:9px"></i></div>
+                                    }
+                                    else if (gameArea[j, i] == 3)
+                                    {
+                                        <div class="col align-content-around battleship-grid bg-warning text-white"><i class='fas fa-water' style='font-size:9px'></i></div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col align-content-around battleship-grid bg-info text-white">-</div>
+                                    }
+                                }
+                            }
+                        </div>
+                    }
+                }
+            </div>
+            <div class="col-3"></div>
+        </div>
+    </div>
+}
+

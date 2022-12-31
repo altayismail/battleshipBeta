@@ -1,5 +1,6 @@
 ﻿using battleshipBeta.Database;
 using battleshipBeta.Entities;
+using System.Security.Cryptography.X509Certificates;
 
 namespace battleshipBeta
 {
@@ -44,6 +45,26 @@ namespace battleshipBeta
                 Console.Write(score.PlayedTime.ToString() + "\n");
             }
             Console.WriteLine("______________________________");
+        }
+
+        public List<ExcelObjectTuttorial> getTuttorialQuery()
+        {
+            var scores = _context.excelObjectTuttorials
+                .ToList<ExcelObjectTuttorial>()
+                .OrderBy(x => x.Duration)
+                .Take(10);
+
+            return scores.ToList<ExcelObjectTuttorial>();
+        }
+
+        public List<ExcelObjectAI> getAIQuery()
+        {
+            var scores = _context.excelObjectAIs
+                .ToList<ExcelObjectAI>()
+                .OrderBy(x => x.Duration)
+                .Take(10);
+
+            return scores.ToList<ExcelObjectAI>();
         }
 
         public void getListOfAIScore()

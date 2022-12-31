@@ -1,0 +1,161 @@
+﻿@using battleship.Models
+@model CoordinateIndex
+@{
+    ViewData["Title"] = "Easy Level";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3 class="m-2 text-info display-6" style="text-align:center;">Easy Level & @ViewData["UserName"]</h3>
+<hr class="mb-2" />
+
+<div class="alert alert-primary d-flex align-items-center" role="alert">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+    </svg>
+    <div>
+        You should enter X and Y coordinate and then click Shoot button to shoot on the Map which is below.
+        Blue area means you have not shoot at this coordinate yet.
+        Yellow area means you have shot at this coordinate but there was no ship.
+        Red area means you have shot at this coordinate and there was a piece of a ship.
+        Green area on your own game area shows position of your ships.
+        Blue with Mines area means there cannot be piece of a ship and you have just sinked a ship.
+    </div>
+</div>
+
+@using (Html.BeginForm("EasyLevel", "Game", FormMethod.Post))
+{
+    <form>
+        <div class="row">
+            <div class="col">
+                <label for="inputEmail4">X Coordinate</label>
+                <input type="text" onblur="checkTextField(this);" class="form-control" placeholder="X Coordinate" name="X" onkeypress="return /[0-9]/i.test(event.key)" maxlength="1" required>
+            </div>
+            <div class="col">
+                <label for="inputEmail4">Y Coordinate</label>
+                <input type="text" onblur="checkTextField(this);" class="form-control" placeholder="Y Coordinate" name="Y" onkeypress="return /[0-9]/i.test(event.key)" maxlength="1" required>
+            </div>
+        </div>
+        <br />
+        <div style="text-align:center;">
+            <button class="button button5">Shoot</button>
+        </div>
+        <br>
+    </form>
+
+    <div class="container" style=" margin-top:25px;">
+        <div class="row">
+            <div class="col-6">
+                <div class="container">
+                    @{
+                        int[,] userGameArea = ViewData["UserGameArea"] as int[,];
+                        <div class="alert alert-info" style="text-align:center;" role="alert">
+                            @{
+                                var label = $"{ViewData["UserName"]}'s Game Area";
+                            }
+                            @label
+                        </div>
+                        <div class="row">
+                            <div class="col battleship-grid bg-white text-dark"></div>
+                            @for (int f = 0; f < 10; f++)
+                            {
+                                <div class="col battleship-grid bg-white text-dark">@f</div>
+                            }
+                        </div>
+                        for (int i = 0; i < 10; i++)
+                        {
+                            <div class="row">
+                                @{
+                                    <div class="col battleship-grid bg-white text-dark">@i</div>
+                                    for (int j = 0; j < 10; j++)
+                                    {
+                                        if (userGameArea[j, i] == 0)
+                                        {
+                                            <div class="col align-content-around battleship-grid bg-primary text-white"><i class='fas fa-water' style='font-size:9px'></i></div>
+                                        }
+                                        else if (userGameArea[j, i] == 1)
+                                        {
+                                            <div class="col align-content-around battleship-grid bg-success text-white"><i class='fas fa-ship' style='font-size:9px'></i></div>
+                                        }
+                                        else if (userGameArea[j, i] == 2)
+                                        {
+                                            <div class="col align-content-around battleship-grid bg-danger text-white"><i class="fa fa-fire" style="font-size:9px"></i></div>
+                                        }
+                                        else if (userGameArea[j, i] == 3)
+                                        {
+                                            <div class="col align-content-around battleship-grid bg-warning text-white"><i class='fas fa-water' style='font-size:9px'></i></div>
+                                        }
+                                        else
+                                        {
+                                            <div class="col align-content-around battleship-grid bg-info text-white">-</div>
+                                        }
+                                    }
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="container">
+                    @{
+                        int[,] computerGameArea = ViewData["ComputerGameArea"] as int[,];
+                        <div class="alert alert-info" style="text-align:center;" role="alert">
+                            Computer's Game Area
+                        </div>
+                        <div class="row">
+                            <div class="col battleship-grid bg-white text-dark"></div>
+                            @for (int f = 0; f < 10; f++)
+                            {
+                                <div class="col battleship-grid bg-white text-dark">@f</div>
+                            }
+                        </div>
+                        for (int i = 0; i < 10; i++)
+                        {
+                            <div class="row">
+                                @{
+                                    <div class="col battleship-grid bg-white text-dark">@i</div>
+                                    for (int j = 0; j < 10; j++)
+                                    {
+                                        if (computerGameArea[j, i] == 0)
+                                        {
+                                            <div class="col align-content-around battleship-grid bg-primary text-white"><i class='fas fa-water' style='font-size:10px'></i></div>
+                                        }
+                                        else if (computerGameArea[j, i] == 1)
+                                        {
+                                            <div class="col align-content-around battleship-grid bg-primary text-white"><i class='fas fa-water' style='font-size:10px'></i></div>
+                                        }
+                                        else if (computerGameArea[j, i] == 2)
+                                        {
+                                            <div class="col align-content-around battleship-grid bg-danger text-white"><i class="fa fa-fire" style="font-size:10px"></i></div>
+                                        }
+                                        else if (computerGameArea[j, i] == 3)
+                                        {
+                                            <div class="col align-content-around battleship-grid bg-warning text-white"><i class='fas fa-water' style='font-size:10px'></i></div>
+                                        }
+                                        else
+                                        {
+                                            <div class="col battleship-grid bg-info text-white">-</div>
+                                        }
+                                    }
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<hr class="mt-2 mb-2" />
+<div class="container">
+    <div class="row">
+        <div class="col-6" style="text-align:center;">
+            <h2>@ViewData["UserName"] Shot Count : @ViewData["UserRoundCounter"]</h2>
+        </div>
+        <div class="col-6" style="text-align:center;">
+            <h2>Computer Shot Count : @ViewData["ComputerRoundCounter"]</h2>
+        </div>
+    </div>
+</div>
+<hr class="mt-2" />

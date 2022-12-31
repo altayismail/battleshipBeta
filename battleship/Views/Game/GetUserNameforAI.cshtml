@@ -1,0 +1,36 @@
+﻿@using battleship.Models
+@model User
+@{
+    ViewData["Title"] = "User Information";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="alert alert-primary d-flex align-items-centermt-5 mt-5" role="alert">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+    </svg>
+    <div>
+        Please enter your firstname and lastname, choose AI level and make decision for ship placement.
+    </div>
+</div>
+
+@using (Html.BeginForm("GetUserNameforAI", "Game", FormMethod.Post))
+{
+    @Html.LabelFor(model => model.Firstname, "Firstname")
+    @Html.TextBoxFor(model => model.Firstname, new { @class = "form-control", @required= "required" })
+    <br />
+    @Html.LabelFor(model => model.Lastname, "Lastname")
+    @Html.TextBoxFor(model => model.Lastname, new { @class = "form-control", @required= "required" })
+    <br />
+    @Html.LabelFor(model => model.AILevel, "AI Level")
+    @Html.DropDownListFor(model => model.AILevel, Enum.GetNames(typeof(Level)).Select(e => new SelectListItem { Text = e }), new { @class = "form-control" })
+    <br />
+    @Html.LabelFor(model => model.isRandomPlacement, "Do you want to place your ships randomly?")
+    @Html.DropDownListFor(model => model.isRandomPlacement, new List<SelectListItem>()
+    {
+       new SelectListItem() { Text = "Yes", Value = "True" },
+       new SelectListItem() { Text = "No", Value = "False"}
+    }, new { @class = "form-control"})
+    <br />
+    <button onclick="return confirm('We are going to save your name, are you sure?')" class="btn btn-outline-primary mt-2">Go to Game</button>
+}
