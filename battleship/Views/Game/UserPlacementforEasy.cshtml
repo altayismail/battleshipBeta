@@ -49,8 +49,12 @@
         @Html.DropDownListFor(model => model.strVerOrHor, new [] { new SelectListItem { Text = "Vertical", Value="False" } , new SelectListItem { Text = "Horizontal", Value="True"} }, new { @class = "form-control" })
         <br>
         <div style="text-align:center;">
-            <button class="button button5 bg-primary">Place</button>
+            <button onclick="audio.play()" class="button button5 bg-primary">Place</button>
         </div>
+        <script type="text/javascript">
+            const audio = new Audio();
+            audio.src = "/lib/ocean.mp3";
+        </script>
         <br>
     </form>
 

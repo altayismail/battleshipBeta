@@ -286,7 +286,7 @@ namespace battleshipBeta
         }
 
         //computer hard level shoot mechanism MVC
-        public ((int,int),(int, int), bool, bool, bool, bool, string, int, bool, string ) computerHardLevelShoot(int[,] userGameArea, List<Ship> userShips, int computerRoundCounter, (int, int) lastShootedIndexMVC, (int, int) shipFoundStartPointMVC, bool isShipFoundMVC, bool lastShotSuccessMVC, bool firstSuccessShotCheckerMVC, bool threeAreaCheckerMVC, string directionMVC, int randomActivaterMVC, bool isUserTurn)
+        public ((int,int),(int, int), bool, bool, bool, bool, string, int, bool, string) computerHardLevelShoot(int[,] userGameArea, List<Ship> userShips, int computerRoundCounter, (int, int) lastShootedIndexMVC, (int, int) shipFoundStartPointMVC, bool isShipFoundMVC, bool lastShotSuccessMVC, bool firstSuccessShotCheckerMVC, bool threeAreaCheckerMVC, string directionMVC, int randomActivaterMVC, bool isUserTurn)
         {
             string sinkedShip = null;
             while (true)
@@ -307,12 +307,6 @@ namespace battleshipBeta
                 {
                     (X, Y) = shipFoundStartPointMVC;
                     ((X, Y), directionMVC) = shootInRow(X, Y, userGameArea, directionMVC);
-                }
-                else if (threeAreaCheckerMVC == true)
-                {
-                    (X, Y) = shipFoundStartPointMVC;
-                    ((X, Y), directionMVC) = shootInRow(X, Y, userGameArea, directionMVC);
-                    threeAreaCheckerMVC = false;
                 }
                 else if (isShipFoundMVC == false)
                 {

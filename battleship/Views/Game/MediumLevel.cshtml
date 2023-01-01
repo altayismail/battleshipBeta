@@ -37,8 +37,12 @@
         </div>
         <br />
         <div style="text-align:center;">
-            <button class="button button5">Shoot</button>
+            <button onclick="audio.play()" class="button button5">Shoot</button>
         </div>
+        <script type="text/javascript">
+            const audio = new Audio();
+            audio.src = "/lib/multiplerocket.mp3";
+        </script>
         <br>
     </form>
 

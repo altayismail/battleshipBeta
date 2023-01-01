@@ -80,7 +80,7 @@ namespace battleship.Controllers
                 ship.isShipPlaced = true;
                 placement.setShipLocation(ship);
             }
-
+            Thread.Sleep(3000);
             if(userShips.All(x => x.isShipPlaced == true))
                 return RedirectToAction("HardLevel");
             return RedirectToAction("UserPlacementforHard");
@@ -113,7 +113,7 @@ namespace battleship.Controllers
                                     _memoryDatabase.Users.ToList().Last().Lastname;
             ViewData["UserRoundCounter"] = _memoryDatabase.Users.ToList().Last().UserRoundCounter;
             ViewData["ComputerRoundCounter"] = _memoryDatabase.Computers.ToList().Last().ComputerRoundCounter;
-
+            Thread.Sleep(7000);
             if(GameSettings.isUserTurn == true)
             {
                 (ViewData["ShipInfo"],GameSettings.isUserTurn) = game.userShoot(Board.ComputerGameArea,
@@ -238,7 +238,7 @@ namespace battleship.Controllers
                 ship.isShipPlaced = true;
                 placement.setShipLocation(ship);
             }
-
+            Thread.Sleep(3000);
             if (userShips.All(x => x.isShipPlaced == true))
                 return RedirectToAction("MediumLevel");
             return RedirectToAction("UserPlacementforMedium");
@@ -271,7 +271,7 @@ namespace battleship.Controllers
                                     _memoryDatabase.Users.ToList().Last().Lastname;
             ViewData["UserRoundCounter"] = _memoryDatabase.Users.ToList().Last().UserRoundCounter;
             ViewData["ComputerRoundCounter"] = _memoryDatabase.Computers.ToList().Last().ComputerRoundCounter;
-
+            Thread.Sleep(7000);
             if (GameSettings.isUserTurn == true)
             {
                 (ViewData["ShipInfo"], GameSettings.isUserTurn) = game.userShoot(Board.ComputerGameArea,
@@ -394,7 +394,7 @@ namespace battleship.Controllers
                 ship.isShipPlaced = true;
                 placement.setShipLocation(ship);
             }
-
+            Thread.Sleep(3000);
             if (userShips.All(x => x.isShipPlaced == true))
                 return RedirectToAction("EasyLevel");
             return RedirectToAction("UserPlacementforEasy");
@@ -425,7 +425,7 @@ namespace battleship.Controllers
                                     _memoryDatabase.Users.ToList().Last().Lastname;
             ViewData["UserRoundCounter"] = _memoryDatabase.Users.ToList().Last().UserRoundCounter;
             ViewData["ComputerRoundCounter"] = _memoryDatabase.Computers.ToList().Last().ComputerRoundCounter;
-
+            Thread.Sleep(7000);
             if (GameSettings.isUserTurn == true)
             {
                 (ViewData["ShipInfo"], GameSettings.isUserTurn) = game.userShoot(Board.ComputerGameArea,
@@ -543,6 +543,8 @@ namespace battleship.Controllers
                                     _memoryDatabase.Users.ToList().Last().Lastname;
             ViewData["UserRoundCounter"] = _memoryDatabase.Users.ToList().Last().UserRoundCounter;
             ViewData["GameArea"] = Board.ComputerGameArea;
+
+            Thread.Sleep(3000);
 
             ViewData["ShipInfo"] = game.userShoot(Board.ComputerGameArea,
                 game.getListOfComputerShip(Shipper.computerAircraft, Shipper.computerBattleship, Shipper.computerCruiser, Shipper.computerSubmarine, Shipper.computerDestroyer),
